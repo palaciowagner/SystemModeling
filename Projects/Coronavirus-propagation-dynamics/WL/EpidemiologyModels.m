@@ -726,6 +726,137 @@ SEIRModel[___] :=
       $Failed
     ];
 
+(***********************************************************)
+(* SEIR                                                   *)
+(***********************************************************)
+(*
+   Initially I "programmed" this model by just modifying the full SEI2R code.
+   But it is better the SEIR implementation to be done with (self contained) model modification.
+   The "SEIR as modified SEI2R" is what is implemented. To verify used the comparison:
+
+     Merge[{model2SEIR, modelSEIR}, If[AssociationQ[#[[1]]], Complement @@ Map[Normal, #], Complement @@ #] &]
+
+   with the code modified SEI2R.
+*)
+
+Clear[SEIQRModel];
+
+SyntaxInformation[SEIQRModel] = { "ArgumentsPattern" -> { _, _., OptionsPattern[] } };
+
+SEIQRModel::"nargs" = "The first argument is expected to be a (time variable) symbol. \
+The second optional argument is expected to be context string.";
+
+SEIQRModel::"ntpval" = "The value of the option \"TotalPopulationRepresentation\" is expected to be one of \
+Automatic, \"Constant\", \"SumSubstitution\", \"AlgebraicEquation\"";
+
+Options[SEIQRModel] = {
+  "TotalPopulationRepresentation" -> None,
+  "InitialConditions" -> True,
+  "RateRules" -> True,
+  "BirthsTerm" -> False,
+  "MoneyTracking" -> False
+};
+
+SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
+    Block[{addRateRulesQ, addInitialConditionsQ, birthsTermQ, moneyTrackingQ,
+      tpRepr, model, lsRepRules, lsDropSymbols, m2},
+
+      addInitialConditionsQ = TrueQ[ OptionValue[ SEIQRModel, "InitialConditions" ] ];
+
+      addRateRulesQ = TrueQ[ OptionValue[ SEIQRModel, "RateRules" ] ];
+
+      birthsTermQ = TrueQ[ OptionValue[SEIQRModel, "BirthsTerm"] ];
+
+      moneyTrackingQ = TrueQ[ OptionValue[ SIRModel, "MoneyTracking" ] ];
+
+      tpRepr = OptionValue[ SEIQRModel, "TotalPopulationRepresentation" ];
+      If[ TrueQ[tpRepr === Automatic] || TrueQ[tpRepr === None], tpRepr = Constant ];
+      If[ !MemberQ[ {Constant, "Constant", "SumSubstitution", "AlgebraicEquation"}, tpRepr ],
+        Message[SEIQRModel::"ntpval"];
+        $Failed
+      ];
+
+      With[{
+        SP = ToExpression[ context <> "SP"],
+        EP = ToExpression[ context <> "EP"],
+        IP = ToExpression[ context <> "IP"],
+        QP = ToExpression[ context <> "QP"],
+        RP = ToExpression[ context <> "RP"],
+        TP = ToExpression[ context <> "TP"],
+        deathRate = ToExpression[ context <> "\[Mu]"],
+        (*        inducedDeathRate = ToExpression[ context <> "\[Del]"],*)
+        populationGrowthRate = ToExpression[ context <> "\[Theta]"],
+        exposedToInfectedRate = ToExpression[ context <> "\[Alpha]1"],
+        suspectedRate = ToExpression[ context <> "\[Alpha]2"],
+        notDetectedRate = ToExpression[ context <> "\[CurlyPhi]"],
+        suspectedToRecoveredRate = ToExpression[ context <> "\[Tau]"],
+        recoveryRate = ToExpression[ context <> "\[Gamma]"]
+      },
+
+        (*
+        Below we modify the SEIR model by essentially excluding money tracking equations.
+        Additional corrections of descriptions and new equations were applied.
+        *)
+
+        model = SEIRModel[ t, context, FilterRules[ Join[ {"InitialConditions" -> True, "RateRules" -> True, "MoneyTracking" -> False}, {opts}], Options[SEIQRModel] ] ];
+
+        lsRepRules = {
+          aip -> 0,
+          aincp -> 0
+        };
+
+        lsDropSymbols = {aip, aincp};
+
+        m2 = model;
+
+        (*        m2["Stocks"] = KeyDrop[m2["Stocks"], ISSP[t]];*)
+        (*        m2["Stocks"] = KeyMap[# /. lsRepRules &, m2["Stocks"]];*)
+        m2["Stocks"] = Join[m2["Stocks"], <|QP[t] -> "Suspected Population"|>];
+
+        m2["Rates"] = KeyDrop[m2["Rates"], lsDropSymbols];
+        m2["Rates"] = KeyMap[# /. lsRepRules &, m2["Rates"]];
+        m2["Rates"] =
+            Join[
+              m2["Rates"],
+              <|
+                (*                deathRate[IP] -> "Infected Population death rate",*)
+                (*                contactRate[IP] -> "Contact rate for the infected population",*)
+                populationGrowthRate[TP] -> "Population Birth Rate",
+                exposedToInfectedRate[EP] -> "Proportion of Exposed to Infected Rate",
+                suspectedRate[EP] -> "Proportion Identified as Suspected (Isolated)",
+                notDetectedRate[QP] -> "Proportion of not detected after medical diagnosis",
+                suspectedToRecoveredRate[QP] -> "Proportion from Suspected to Recovered class",
+                recoveryRate[IP] -> "Recovery Rate"
+              |>
+            ];
+
+
+        m2["Equations"] = ReplacePart[m2["Equations"], {1, 2} -> m2["Equations"][[1, 2]] + populationGrowthRate[TP] + (notDetectedRate[QP] * QP[t])];
+        m2["Equations"] = ReplacePart[m2["Equations"], {1, 2, 1, 4} -> 1 / TP[t]];
+        m2["Equations"] = ReplacePart[m2["Equations"], {2, 2} -> m2["Equations"][[2, 2]][[1]] - EP[t] * (exposedToInfectedRate[EP] + suspectedRate[EP] + deathRate[TP])];
+        m2["Equations"] = ReplacePart[m2["Equations"], {2, 2, 1, 3} -> 1 / TP[t]];
+        m2["Equations"] = ReplacePart[m2["Equations"], {3, 2} -> EP[t] * exposedToInfectedRate[EP] - (deathRate[TP] + deathRate[IP] + recoveryRate[IP]) * IP[t]];
+        m2["Equations"] = ReplacePart[m2["Equations"], {4, 2} -> IP[t] * recoveryRate[IP] + suspectedToRecoveredRate[QP] * QP[t] - deathRate[TP] * RP[t]];
+
+        AppendTo[m2["Equations"], QP[t] == EP[t] * suspectedRate[EP] - (notDetectedRate[QP] + suspectedToRecoveredRate[QP] + deathRate[TP] + deathRate[IP]) * QP[t]];
+        AppendTo[m2["Equations"], TP'[t] == populationGrowthRate[TP] - deathRate[IP] * IP[t] - deathRate[TP] * TP[t]];
+
+        m2["RateRules"] = KeyDrop[m2["RateRules"], lsDropSymbols];
+(*        m2["Equations"] = DeleteCases[m2["Equations"], Equal[ISSP'[t], __]];*)
+(*        m2["Equations"] = Map[# /. lsRepRules &, m2["Equations"]];*)
+(*        m2["InitialConditions"] = DeleteCases[m2["InitialConditions"], ISSP[0] == 1] /. lsRepRules;*)
+        m2["RateRules"] = Association[Normal[m2["RateRules"]] /. lsRepRules];
+
+        m2
+      ]
+    ];
+
+SEIQRModel[___] :=
+    Block[{},
+      Message[SEIQRModel::"nargs"];
+      $Failed
+    ];
+
 
 (***********************************************************)
 (* SEI2R                                                   *)
