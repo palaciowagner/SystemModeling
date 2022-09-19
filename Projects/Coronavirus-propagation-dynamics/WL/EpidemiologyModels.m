@@ -834,13 +834,13 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
 
         Which[
           MemberQ[{Constant, "Constant"}, tpRepr],
-          lsEquations = lsEquations /. TP[t] -> TP[0],
+          lsEquations := lsEquations /. TP[t] -> TP[0],
 
           tpRepr == "SumSubstitution",
-          lsEquations = lsEquations /. TP[t] -> totalPopulationGrowth,
+          lsEquations := lsEquations /. TP[t] -> totalPopulationGrowth,
 
           tpRepr == "AlgebraicEquation",
-          lsEquations = Append[lsEquations, TP[t] == Max[ 0, totalPopulationGrowth ] ]
+          lsEquations := Append[lsEquations, TP[t] == Max[ 0, totalPopulationGrowth ] ]
         ];
 
         aRes = <| "Stocks" -> aStocks, "Rates" -> aRates, "Equations" -> lsEquations |>;
@@ -861,7 +861,7 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
             |>;
 
         (* Initial conditions *)
-        aInitialConditions =
+        aInitialConditions :=
             {
               SP[0] == (TP[0] /. aRateRules) - 1,
               IP[0] == 1,
