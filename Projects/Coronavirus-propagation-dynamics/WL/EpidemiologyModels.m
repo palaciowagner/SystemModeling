@@ -788,7 +788,7 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         QP = ToExpression[ context <> "QP"],
         RP = ToExpression[ context <> "RP"],
         naturalDeathRate = ToExpression[ context <> "\[Mu]"],
-        inducedDeathRate = ToExpression[ context <> "\[Del]"],
+        inducedDeathRate = ToExpression[ context <> "\[Delta]"],
         contactRate = ToExpression[ context <> "\[Beta]"],
         populationGrowthRate = ToExpression[ context <> "\[Theta]"],
         exposedToInfectedRate = ToExpression[ context <> "\[Alpha]1"],
@@ -829,7 +829,7 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
           EP'[t] == newlyExposedRate - (exposedToInfectedRate[EP] + suspectedRate[EP] + naturalDeathRate[TP]) * EP[t],
           IP'[t] == EP[t] * exposedToInfectedRate[EP] - (naturalDeathRate[TP] + inducedDeathRate[IP] + recoveryRate[IP]) * IP[t],
           QP'[t] == EP[t] * suspectedRate[EP] - (notDetectedRate[QP] + suspectedToRecoveredRate[QP] + naturalDeathRate[TP] + inducedDeathRate[IP]) * QP[t],
-          RP'[t] == IP[t] * recoveryRate[IP] + suspectedToRecoveredRate[QP] * QP[t] - deathRate[TP] * RP[t]
+          RP'[t] == (IP[t] * recoveryRate[IP]) + (suspectedToRecoveredRate[QP] * QP[t]) - (naturalDeathRate[TP] * RP[t])
         };
 
         Which[
