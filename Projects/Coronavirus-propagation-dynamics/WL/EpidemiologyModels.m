@@ -81,6 +81,9 @@ using the time variable var with symbols in the context con.";
 SEIRModel::usage = "SEIRModel[var, con] generates SEIR model stocks, rates, and equations \
 using the time variable var with symbols in the context con.";
 
+SEIQRModel::usage = "SEIRQModel[var, con] generates SEIQR model stocks, rates, and equations for Monkeypox evaluation \
+using the time variable var with symbols in the context con.";
+
 SEI2RModel::usage = "SEI2RModel[var, con] generates SEI2R model stocks, rates, and equations \
 using the time variable var with symbols in the context con.";
 
@@ -727,16 +730,15 @@ SEIRModel[___] :=
     ];
 
 (***********************************************************)
-(* SEIR                                                   *)
+(* SEIQRModel                                                   *)
 (***********************************************************)
 (*
-   Initially I "programmed" this model by just modifying the full SEI2R code.
-   But it is better the SEIR implementation to be done with (self contained) model modification.
-   The "SEIR as modified SEI2R" is what is implemented. To verify used the comparison:
+   Wagner - Initially I "programmed" this model by just modifying the full SEIR code.
+   The "SEIQR as modified SEIR" is what is implemented. To verify used the comparison:
 
-     Merge[{model2SEIR, modelSEIR}, If[AssociationQ[#[[1]]], Complement @@ Map[Normal, #], Complement @@ #] &]
+     Merge[{modelSEIQR, modelSEIR}, If[AssociationQ[#[[1]]], Complement @@ Map[Normal, #], Complement @@ #] &]
 
-   with the code modified SEI2R.
+   with the code modified SEIR.
 *)
 
 Clear[SEIQRModel];
