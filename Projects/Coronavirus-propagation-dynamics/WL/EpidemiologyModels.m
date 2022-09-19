@@ -761,7 +761,9 @@ Options[SEIQRModel] = {
 
 SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
     Block[{addRateRulesQ, addInitialConditionsQ, birthsTermQ, moneyTrackingQ,
-      tpRepr, model, lsRepRules, lsDropSymbols, m2},
+      (*      model, lsRepRules, lsDropSymbols, m2,*)
+      tpRepr, aStocks, aRates, newlyExposedRate,
+      totalPopulationGrowth, lsEquations, aRes, aRateRules, aInitialConditions},
 
       addInitialConditionsQ = TrueQ[ OptionValue[ SEIQRModel, "InitialConditions" ] ];
 
@@ -779,14 +781,15 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
       ];
 
       With[{
+        TP = ToExpression[ context <> "TP"],
         SP = ToExpression[ context <> "SP"],
         EP = ToExpression[ context <> "EP"],
         IP = ToExpression[ context <> "IP"],
         QP = ToExpression[ context <> "QP"],
         RP = ToExpression[ context <> "RP"],
-        TP = ToExpression[ context <> "TP"],
-        deathRate = ToExpression[ context <> "\[Mu]"],
-        (*        inducedDeathRate = ToExpression[ context <> "\[Del]"],*)
+        naturalDeathRate = ToExpression[ context <> "\[Mu]"],
+        inducedDeathRate = ToExpression[ context <> "\[Del]"],
+        contactRate = ToExpression[ context <> "\[Beta]"],
         populationGrowthRate = ToExpression[ context <> "\[Theta]"],
         exposedToInfectedRate = ToExpression[ context <> "\[Alpha]1"],
         suspectedRate = ToExpression[ context <> "\[Alpha]2"],
@@ -795,61 +798,150 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         recoveryRate = ToExpression[ context <> "\[Gamma]"]
       },
 
-        (*
-        Below we modify the SEIR model by essentially excluding money tracking equations.
-        Additional corrections of descriptions and new equations were applied.
-        *)
+        (* Stocks *)
+        aStocks =
+            <|TP[t] -> "Total Population" ,
+              SP[t] -> "Susceptible Population",
+              IP[t] -> "Infected Population",
+              QP[t] -> "Suspected Population",
+              RP[t] -> "Recovered Population"|>;
 
-        model = SEIRModel[ t, context, FilterRules[ Join[ {"InitialConditions" -> True, "RateRules" -> True, "MoneyTracking" -> False}, {opts}], Options[SEIQRModel] ] ];
+        (* Rates  *)
+        aRates =
+            <|
+              populationGrowthRate[TP] -> "Population Birth Rate",
+              naturalDeathRate[TP] -> "Population Death rate",
+              inducedDeathRate[IP] -> "Infected Population Death rate",
+              contactRate[IP] -> "Contact rate for the infected population",
+              exposedToInfectedRate[EP] -> "Proportion of Exposed to Infected Rate",
+              suspectedRate[EP] -> "Proportion Identified as Suspected (Isolated)",
+              notDetectedRate[QP] -> "Proportion of not detected after medical diagnosis",
+              suspectedToRecoveredRate[QP] -> "Proportion from Suspected to Recovered class",
+              recoveryRate[IP] -> "Recovery Rate"
+            |>;
 
-        lsRepRules = {
-          aip -> 0,
-          aincp -> 0
+        newlyExposedRate := (contactRate[IP] * IP[t] * SP[t]) / TP[t];
+        totalPopulationGrowth := populationGrowthRate[TP] - inducedDeathRate[IP] * IP[t] - naturalDeathRate[TP] * totalPopulationGrowth;
+
+        (*Equations*)
+        lsEquations = {
+          SP'[t] == populationGrowthRate[TP] - newlyExposedRate - naturalDeathRate[TP] * SP[t] + suspectedToRecoveredRate[QP] * QP[t],
+          EP'[t] == newlyExposedRate - (exposedToInfectedRate[EP] + suspectedRate[EP] + naturalDeathRate[TP]) * EP[t],
+          IP'[t] == EP[t] * exposedToInfectedRate[EP] - (naturalDeathRate[TP] + inducedDeathRate[IP] + recoveryRate[IP]) * IP[t],
+          QP'[t] == EP[t] * suspectedRate[EP] - (notDetectedRate[QP] + suspectedToRecoveredRate[QP] + naturalDeathRate[TP] + inducedDeathRate[IP]) * QP[t],
+          RP'[t] == IP[t] * recoveryRate[IP] + suspectedToRecoveredRate[QP] * QP[t] - deathRate[TP] * RP[t]
         };
 
-        lsDropSymbols = {aip, aincp};
+        Which[
+          MemberQ[{Constant, "Constant"}, tpRepr],
+          lsEquations = lsEquations /. TP[t] -> TP[0],
 
-        m2 = model;
+          tpRepr == "SumSubstitution",
+          lsEquations = lsEquations /. TP[t] -> totalPopulationGrowth,
 
-        (*        m2["Stocks"] = KeyDrop[m2["Stocks"], ISSP[t]];*)
-        (*        m2["Stocks"] = KeyMap[# /. lsRepRules &, m2["Stocks"]];*)
-        m2["Stocks"] = Join[m2["Stocks"], <|QP[t] -> "Suspected Population"|>];
+          tpRepr == "AlgebraicEquation",
+          lsEquations = Append[lsEquations, TP[t] == Max[ 0, totalPopulationGrowth ] ]
+        ];
 
-        m2["Rates"] = KeyDrop[m2["Rates"], lsDropSymbols];
-        m2["Rates"] = KeyMap[# /. lsRepRules &, m2["Rates"]];
-        m2["Rates"] =
-            Join[
-              m2["Rates"],
-              <|
-                (*                deathRate[IP] -> "Infected Population death rate",*)
-                (*                contactRate[IP] -> "Contact rate for the infected population",*)
-                populationGrowthRate[TP] -> "Population Birth Rate",
-                exposedToInfectedRate[EP] -> "Proportion of Exposed to Infected Rate",
-                suspectedRate[EP] -> "Proportion Identified as Suspected (Isolated)",
-                notDetectedRate[QP] -> "Proportion of not detected after medical diagnosis",
-                suspectedToRecoveredRate[QP] -> "Proportion from Suspected to Recovered class",
-                recoveryRate[IP] -> "Recovery Rate"
-              |>
-            ];
+        aRes = <| "Stocks" -> aStocks, "Rates" -> aRates, "Equations" -> lsEquations |>;
+
+        (* Rate Rules *)
+        aRateRules =
+            <|
+              TP[0] -> 100000,
+              populationGrowthRate[TP] -> 0.029,
+              naturalDeathRate[TP] -> 1.5,
+              inducedDeathRate[IP] -> 0.2,
+              contactRate[IP] -> 0.00006,
+              exposedToInfectedRate[EP] -> 0.2,
+              suspectedRate[EP] -> 2.0,
+              notDetectedRate[QP] -> 2.0,
+              suspectedToRecoveredRate[QP] -> 0.52,
+              recoveryRate[IP] -> 0.83
+            |>;
+
+        (* Initial conditions *)
+        aInitialConditions =
+            {
+              SP[0] == (TP[0] /. aRateRules) - 1,
+              IP[0] == 1,
+              QP[0] == 0,
+              RP[0] == 0};
+
+        (* Result *)
+        If[ tpRepr == "AlgebraicEquation",
+          aInitialConditions = Append[aInitialConditions, TP[0] == (TP[0] /. aRateRules)];
+          aRateRules = KeyDrop[aRateRules, TP[0]]
+        ];
+
+        If[ addRateRulesQ,
+          aRes = Append[aRes, "RateRules" -> aRateRules]
+        ];
+
+        If[ addInitialConditionsQ,
+          aRes = Append[aRes, "InitialConditions" -> aInitialConditions];
+        ];
+
+        aRes
+
+        (*
+        Below we modify the SEIR model by essentially excluding money tracking equations option.
+        This is how I first did, but then changed to explicitly creating it all above.
+        Additional corrections of descriptions and new equations were applied.
+
+         Should reproduce the same results than above.
+        *)
+
+        (*        model = SEIRModel[ t, context, FilterRules[ Join[ {"InitialConditions" -> True, "RateRules" -> True, "MoneyTracking" -> False}, {opts}], Options[SEIQRModel] ] ];*)
+
+        (*        lsRepRules = {*)
+        (*          aip -> 0,*)
+        (*          aincp -> 0*)
+        (*        };*)
+
+        (*        lsDropSymbols = {aip, aincp};*)
+
+        (*        m2 = model;*)
+
+        (*        *)(*        m2["Stocks"] = KeyDrop[m2["Stocks"], ISSP[t]];*)
+        (*        *)(*        m2["Stocks"] = KeyMap[# /. lsRepRules &, m2["Stocks"]];*)
+        (*        m2["Stocks"] = Join[m2["Stocks"], <|QP[t] -> "Suspected Population"|>];*)
+
+        (*        m2["Rates"] = KeyDrop[m2["Rates"], lsDropSymbols];*)
+        (*        m2["Rates"] = KeyMap[# /. lsRepRules &, m2["Rates"]];*)
+        (*        m2["Rates"] =*)
+        (*            Join[*)
+        (*              m2["Rates"],*)
+        (*              <|*)
+        (*                *)(*                deathRate[IP] -> "Infected Population death rate",*)
+        (*                *)(*                contactRate[IP] -> "Contact rate for the infected population",*)
+        (*                populationGrowthRate[TP] -> "Population Birth Rate",*)
+        (*                exposedToInfectedRate[EP] -> "Proportion of Exposed to Infected Rate",*)
+        (*                suspectedRate[EP] -> "Proportion Identified as Suspected (Isolated)",*)
+        (*                notDetectedRate[QP] -> "Proportion of not detected after medical diagnosis",*)
+        (*                suspectedToRecoveredRate[QP] -> "Proportion from Suspected to Recovered class",*)
+        (*                recoveryRate[IP] -> "Recovery Rate"*)
+        (*              |>*)
+        (*            ];*)
 
 
-        m2["Equations"] = ReplacePart[m2["Equations"], {1, 2} -> m2["Equations"][[1, 2]] + populationGrowthRate[TP] + (notDetectedRate[QP] * QP[t])];
-        m2["Equations"] = ReplacePart[m2["Equations"], {1, 2, 1, 4} -> 1 / TP[t]];
-        m2["Equations"] = ReplacePart[m2["Equations"], {2, 2} -> m2["Equations"][[2, 2]][[1]] - EP[t] * (exposedToInfectedRate[EP] + suspectedRate[EP] + deathRate[TP])];
-        m2["Equations"] = ReplacePart[m2["Equations"], {2, 2, 1, 3} -> 1 / TP[t]];
-        m2["Equations"] = ReplacePart[m2["Equations"], {3, 2} -> EP[t] * exposedToInfectedRate[EP] - (deathRate[TP] + deathRate[IP] + recoveryRate[IP]) * IP[t]];
-        m2["Equations"] = ReplacePart[m2["Equations"], {4, 2} -> IP[t] * recoveryRate[IP] + suspectedToRecoveredRate[QP] * QP[t] - deathRate[TP] * RP[t]];
+        (*        m2["Equations"] = ReplacePart[m2["Equations"], {1, 2} -> m2["Equations"][[1, 2]] + populationGrowthRate[TP] + (notDetectedRate[QP] * QP[t])];*)
+        (*        m2["Equations"] = ReplacePart[m2["Equations"], {1, 2, 1, 4} -> 1 / TP[t]];*)
+        (*        m2["Equations"] = ReplacePart[m2["Equations"], {2, 2} -> m2["Equations"][[2, 2]][[1]] - EP[t] * (exposedToInfectedRate[EP] + suspectedRate[EP] + deathRate[TP])];*)
+        (*        m2["Equations"] = ReplacePart[m2["Equations"], {2, 2, 1, 3} -> 1 / TP[t]];*)
+        (*        m2["Equations"] = ReplacePart[m2["Equations"], {3, 2} -> EP[t] * exposedToInfectedRate[EP] - (deathRate[TP] + deathRate[IP] + recoveryRate[IP]) * IP[t]];*)
+        (*        m2["Equations"] = ReplacePart[m2["Equations"], {4, 2} -> IP[t] * recoveryRate[IP] + suspectedToRecoveredRate[QP] * QP[t] - deathRate[TP] * RP[t]];*)
 
-        AppendTo[m2["Equations"], QP[t] == EP[t] * suspectedRate[EP] - (notDetectedRate[QP] + suspectedToRecoveredRate[QP] + deathRate[TP] + deathRate[IP]) * QP[t]];
-        AppendTo[m2["Equations"], TP'[t] == populationGrowthRate[TP] - deathRate[IP] * IP[t] - deathRate[TP] * TP[t]];
+        (*        AppendTo[m2["Equations"], QP'[t] == EP[t] * suspectedRate[EP] - (notDetectedRate[QP] + suspectedToRecoveredRate[QP] + deathRate[TP] + deathRate[IP]) * QP[t]];*)
+        (*        AppendTo[m2["Equations"], TP'[t] == populationGrowthRate[TP] - deathRate[IP] * IP[t] - deathRate[TP] * TP[t]];*)
 
-        m2["RateRules"] = KeyDrop[m2["RateRules"], lsDropSymbols];
-(*        m2["Equations"] = DeleteCases[m2["Equations"], Equal[ISSP'[t], __]];*)
-(*        m2["Equations"] = Map[# /. lsRepRules &, m2["Equations"]];*)
-(*        m2["InitialConditions"] = DeleteCases[m2["InitialConditions"], ISSP[0] == 1] /. lsRepRules;*)
-        m2["RateRules"] = Association[Normal[m2["RateRules"]] /. lsRepRules];
+        (*        m2["RateRules"] = KeyDrop[m2["RateRules"], lsDropSymbols];*)
+        (*        *)(*        m2["Equations"] = DeleteCases[m2["Equations"], Equal[ISSP'[t], __]];*)
+        (*        *)(*        m2["Equations"] = Map[# /. lsRepRules &, m2["Equations"]];*)
+        (*        *)(*        m2["InitialConditions"] = DeleteCases[m2["InitialConditions"], ISSP[0] == 1] /. lsRepRules;*)
+        (*        m2["RateRules"] = Association[Normal[m2["RateRules"]] /. lsRepRules];*)
 
-        m2
+        (*        m2*)
       ]
     ];
 
