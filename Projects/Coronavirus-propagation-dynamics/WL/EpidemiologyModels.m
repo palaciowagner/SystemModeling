@@ -810,29 +810,29 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         (* Rates  *)
         aRates =
             <|
-              populationGrowthRate[TP] -> "Population Birth Rate",
-              naturalDeathRate[TP] -> "Population Death rate",
-              inducedDeathRate[IP] -> "Infected Population Death rate",
-              contactRate[IP] -> "Contact rate for the infected population",
-              exposedToInfectedRate[EP] -> "Proportion of Exposed to Infected Rate",
-              suspectedRate[EP] -> "Proportion Identified as Suspected (Isolated)",
-              notDetectedRate[QP] -> "Proportion of not detected after medical diagnosis",
-              suspectedToRecoveredRate[QP] -> "Proportion from Suspected to Recovered class",
-              recoveryRate[IP] -> "Recovery Rate"
+              populationGrowthRate -> "Population Birth Rate",
+              naturalDeathRate -> "Population Death rate",
+              inducedDeathRate -> "Infected Population Death rate",
+              contactRate -> "Contact rate for the infected population",
+              exposedToInfectedRate -> "Proportion of Exposed to Infected Rate",
+              suspectedRate -> "Proportion Identified as Suspected (Isolated)",
+              notDetectedRate -> "Proportion of not detected after medical diagnosis",
+              suspectedToRecoveredRate -> "Proportion from Suspected to Recovered class",
+              recoveryRate -> "Recovery Rate"
             |>;
 
-        Block[{$RecursionLimit = Infinity}, populationGrowthRate[TP]];
+        Block[{$RecursionLimit = Infinity}, populationGrowthRate];
 
-        newlyExposedRate := (contactRate[IP] * IP[t] * SP[t]) / TP[t];
-        totalPopulationGrowth := populationGrowthRate[TP] - inducedDeathRate[IP] * IP[t] - naturalDeathRate[TP] * TP[t];
+        newlyExposedRate := (contactRate * IP[t] * SP[t]) / TP[t];
+        totalPopulationGrowth := populationGrowthRate - inducedDeathRate * IP[t] - naturalDeathRate * TP[t];
 
         (*Equations*)
         lsEquations = {
-          SP'[t] == populationGrowthRate[TP] - newlyExposedRate - naturalDeathRate[TP] * SP[t] + suspectedToRecoveredRate[QP] * QP[t],
-          EP'[t] == newlyExposedRate - (exposedToInfectedRate[EP] + suspectedRate[EP] + naturalDeathRate[TP]) * EP[t],
-          IP'[t] == EP[t] * exposedToInfectedRate[EP] - (naturalDeathRate[TP] + inducedDeathRate[IP] + recoveryRate[IP]) * IP[t],
-          QP'[t] == EP[t] * suspectedRate[EP] - (notDetectedRate[QP] + suspectedToRecoveredRate[QP] + naturalDeathRate[TP] + inducedDeathRate[IP]) * QP[t],
-          RP'[t] == (IP[t] * recoveryRate[IP]) + (suspectedToRecoveredRate[QP] * QP[t]) - (naturalDeathRate[TP] * RP[t])
+          SP'[t] == populationGrowthRate - newlyExposedRate - naturalDeathRate * SP[t] + suspectedToRecoveredRate * QP[t],
+          EP'[t] == newlyExposedRate - (exposedToInfectedRate + suspectedRate + naturalDeathRate) * EP[t],
+          IP'[t] == EP[t] * exposedToInfectedRate - (naturalDeathRate + inducedDeathRate + recoveryRate) * IP[t],
+          QP'[t] == EP[t] * suspectedRate - (notDetectedRate + suspectedToRecoveredRate + naturalDeathRate + inducedDeathRate) * QP[t],
+          RP'[t] == (IP[t] * recoveryRate) + (suspectedToRecoveredRate * QP[t]) - (naturalDeathRate * RP[t])
         };
 
         Which[
@@ -852,15 +852,15 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         aRateRules =
             <|
               TP[0] -> 100000,
-              populationGrowthRate[TP] -> 0.029,
-              naturalDeathRate[TP] -> 1.5,
-              inducedDeathRate[IP] -> 0.2,
-              contactRate[IP] -> 0.00006,
-              exposedToInfectedRate[EP] -> 0.2,
-              suspectedRate[EP] -> 2.0,
-              notDetectedRate[QP] -> 2.0,
-              suspectedToRecoveredRate[QP] -> 0.52,
-              recoveryRate[IP] -> 0.83
+              populationGrowthRate -> 0.029,
+              naturalDeathRate -> 1.5,
+              inducedDeathRate -> 0.2,
+              contactRate -> 0.00006,
+              exposedToInfectedRate -> 0.2,
+              suspectedRate -> 2.0,
+              notDetectedRate -> 2.0,
+              suspectedToRecoveredRate -> 0.52,
+              recoveryRate -> 0.83
             |>;
 
         (* Initial conditions *)
