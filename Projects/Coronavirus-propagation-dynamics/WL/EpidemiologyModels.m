@@ -802,6 +802,7 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         aStocks =
             <|TP[t] -> "Total Population" ,
               SP[t] -> "Susceptible Population",
+              EP[t] -> "Exposed Population",
               IP[t] -> "Infected Population",
               QP[t] -> "Suspected Population",
               RP[t] -> "Recovered Population"|>;
