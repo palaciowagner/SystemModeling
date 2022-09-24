@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 (*
     Epidemiology models Mathematica package
     Copyright (C) 2020  Anton Antonov
@@ -728,9 +730,8 @@ SEIRModel[___] :=
       Message[SEIRModel::"nargs"];
       $Failed
     ];
-
 (***********************************************************)
-(* SEIQRModel                                                   *)
+(* SEIQRModel                                              *)
 (***********************************************************)
 (*
    Wagner - Initially I "programmed" this model by just modifying the full SEIR code.
@@ -821,7 +822,7 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
               recoveryRate -> "Recovery Rate"
             |>;
 
-        Block[{$RecursionLimit = Infinity}, populationGrowthRate];
+        (*Block[{$RecursionLimit = Infinity}, populationGrowthRate];*)
 
         newlyExposedRate := (contactRate * IP[t] * SP[t]) / TP[t];
         totalPopulationGrowth := populationGrowthRate - inducedDeathRate * IP[t] - naturalDeathRate * TP[t];
@@ -840,10 +841,10 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
           lsEquations = lsEquations /. TP[t] -> TP[0],
 
           tpRepr == "SumSubstitution",
-          lsEquations = lsEquations /. TP[t] -> totalPopulationGrowth,
+          lsEquations = lsEquations /. TP[t] -> (SP[t] + EP[t] + IP[t] + QP[t] + RP[t]),
 
           tpRepr == "AlgebraicEquation",
-          lsEquations = Append[lsEquations, TP[t] == Max[ 0, totalPopulationGrowth ] ]
+          lsEquations = Append[lsEquations, TP[t] == Max[ 0, SP[t] + EP[t] + IP[t] + QP[t] + RP[t] ] ]
         ];
 
         aRes = <| "Stocks" -> aStocks, "Rates" -> aRates, "Equations" -> lsEquations |>;
