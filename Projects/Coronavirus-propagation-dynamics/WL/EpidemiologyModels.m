@@ -869,6 +869,7 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
               SP[0] == (TP[0] /. aRateRules) - 1,
               IP[0] == 1,
               QP[0] == 0,
+              EP[0] == 0,
               RP[0] == 0};
 
         (* Result *)
