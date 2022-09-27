@@ -730,6 +730,8 @@ SEIRModel[___] :=
       Message[SEIRModel::"nargs"];
       $Failed
     ];
+    
+ 
 (***********************************************************)
 (* SEIQRModel                                              *)
 (***********************************************************)
@@ -853,9 +855,9 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         aRateRules =
             <|
               TP[0] -> 100000,
-              populationGrowthRate -> 1/0.0029,
-              naturalDeathRate -> 1/0.15,
-              inducedDeathRate -> 1/0.02,
+              populationGrowthRate -> (1 / 0.0029),
+              naturalDeathRate -> (1 / 0.15),
+              inducedDeathRate -> (1 / 0.02),
               contactRate -> 0.00006,
               exposedToInfectedRate -> 0.2,
               suspectedRate -> 2.0,
