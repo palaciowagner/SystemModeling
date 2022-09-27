@@ -826,7 +826,7 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
 
         (*Block[{$RecursionLimit = Infinity}, populationGrowthRate];*)
 
-        newlyExposedRate := ((contactRate * IP[t]) * SP[t]) / TP[t];
+        newlyExposedRate := (contactRate * IP[t] * SP[t]) / TP[t];
         totalPopulationGrowth := populationGrowthRate * TP[t] - inducedDeathRate * IP[t] - naturalDeathRate * TP[t];
 
         (*Equations*)
@@ -855,9 +855,9 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         aRateRules =
             <|
               TP[0] -> 100000,
-              populationGrowthRate -> (1/0.029*10^-1),
-              naturalDeathRate -> (1/1.5*10^-1),
-              inducedDeathRate -> 1(0.2*10^-1),
+              populationGrowthRate -> 0.029*10^-1,
+              naturalDeathRate -> 1.5*10^-1,
+              inducedDeathRate -> 0.2*10^-1,
               contactRate -> 0.00006*10^-1,
               exposedToInfectedRate -> 0.2*10^-1,
               suspectedRate -> 2.0*10^-1,
