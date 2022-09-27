@@ -855,15 +855,15 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         aRateRules =
             <|
               TP[0] -> 100000,
-              populationGrowthRate -> (1 / 0.0029),
-              naturalDeathRate -> (1 / 0.15),
-              inducedDeathRate -> (1 / 0.02),
-              contactRate -> 0.00006,
-              exposedToInfectedRate -> 0.2,
-              suspectedRate -> 2.0,
-              notDetectedRate -> 2.0,
-              suspectedToRecoveredRate -> 0.52,
-              recoveryRate -> 0.83
+              populationGrowthRate -> 0.029*10^-1,
+              naturalDeathRate -> 1.5*10^-1,
+              inducedDeathRate -> 0.2*10^-1,
+              contactRate -> 0.00006*10^-1,
+              exposedToInfectedRate -> 0.2*10^-1,
+              suspectedRate -> 2.0*10^-1,
+              notDetectedRate -> 2.0*10^-1,
+              suspectedToRecoveredRate -> 0.52*10^-1,
+              recoveryRate -> 0.83*10^-1
             |>;
 
         (* Initial conditions *)
