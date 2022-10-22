@@ -95,9 +95,6 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         (* Rates  *)
         aRates =
             <|
-              populationGrowthRate -> "Population Birth Rate",
-              naturalDeathRate -> "Population Death rate",
-              inducedDeathRate -> "Infected Population Death rate",
               contactRate -> "Contact rate for the infected population",
               exposedToInfectedRate -> "Proportion of Exposed to Infected Rate (Confirmed)",
               suspectedRate -> "Proportion Sent to Quarantine (Suspected)",
@@ -117,9 +114,29 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
           RP'[t] == (recoveryRate * IP[t]) + (suspectedToRecoveredRate * QP[t])
         };
 
-        totalPopulationGrowth := populationGrowthRate * NP[t] - inducedDeathRate * IP[t] - naturalDeathRate * NP[t];
+        (* Rate Rules *)
+        aRateRules =
+            <|
+              NP[0] -> 100000,
+              contactRate -> 0.00006*10^-1,
+              exposedToInfectedRate -> 0.2*10^-1,
+              suspectedRate -> 2.0*10^-1,
+              notDetectedRate -> 2.0*10^-1,
+              suspectedToRecoveredRate -> 0.52*10^-1,
+              recoveryRate -> 0.83*10^-1
+            |>;
         
         If[ withVitalDynamicsQ,
+          aRateRules = Append[aRateRules, populationGrowthRate -> 0.029*10^-1];
+          aRateRules = Append[aRateRules, naturalDeathRate -> 1.5*10^-1];
+          aRateRules = Append[aRateRules, inducedDeathRate -> 0.2*10^-1];
+
+          aRates = Append[aRates, populationGrowthRate -> "Population Birth Rate"]
+          aRates = Append[aRates, naturalDeathRate -> "Population Death rate"]
+          aRates = Append[aRates, inducedDeathRate -> "Infected Population Death rate"]
+
+          totalPopulationGrowth := populationGrowthRate * NP[t] - inducedDeathRate * IP[t] - naturalDeathRate * NP[t];
+
           (*Equations*)
           lsEquations = {
             SP'[t] == totalPopulationGrowth - newlyExposedRate - naturalDeathRate * SP[t] + notDetectedRate * QP[t],
@@ -130,7 +147,7 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
           };
         ];
 
-        Which[
+         Which[
           MemberQ[{Constant, "Constant"}, tpRepr],
           lsEquations = lsEquations /. NP[t] -> NP[0],
 
@@ -141,22 +158,9 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
           lsEquations = Append[lsEquations, NP[t] == Max[ 0, SP[t] + EP[t] + IP[t] + QP[t] + RP[t] ] ]
         ];
 
-        aRes = <| "Stocks" -> aStocks, "Rates" -> aRates, "Equations" -> lsEquations |>;
+       
 
-        (* Rate Rules *)
-        aRateRules =
-            <|
-              NP[0] -> 100000,
-              populationGrowthRate -> 0.029*10^-1,
-              naturalDeathRate -> 1.5*10^-1,
-              inducedDeathRate -> 0.2*10^-1,
-              contactRate -> 0.00006*10^-1,
-              exposedToInfectedRate -> 0.2*10^-1,
-              suspectedRate -> 2.0*10^-1,
-              notDetectedRate -> 2.0*10^-1,
-              suspectedToRecoveredRate -> 0.52*10^-1,
-              recoveryRate -> 0.83*10^-1
-            |>;
+        aRes = <| "Stocks" -> aStocks, "Rates" -> aRates, "Equations" -> lsEquations |>;
 
         (* Initial conditions *)
         aInitialConditions =
@@ -171,11 +175,6 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         If[ tpRepr == "AlgebraicEquation",
           aInitialConditions = Append[aInitialConditions, NP[0] == (NP[0] /. aRateRules)];
           aRateRules = KeyDrop[aRateRules, NP[0]]
-        ];
-
-        If [withVitalDynamicsQ, 
-          aRateRules = KeyDrop[aRateRules, naturalDeathRate]
-          aRateRules = KeyDrop[aRateRules, inducedDeathRate]
         ];
 
         If[ addRateRulesQ,

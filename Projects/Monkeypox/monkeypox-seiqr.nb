@@ -1,0 +1,1682 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='WolframDesktop 13.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       161,          7]
+NotebookDataLength[     66367,       1672]
+NotebookOptionsPosition[     64795,       1642]
+NotebookOutlinePosition[     65189,       1658]
+CellTagsIndexPosition[     65146,       1655]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+  "Import", "[", 
+   "\"\<https://raw.githubusercontent.com/palaciowagner/SystemModeling/master/\
+Projects/Monkeypox/SEIQREpidemiologyModel.m\>\"", "]"}], ";"}]], "Input",
+ CellChangeTimes->{{3.875466058208939*^9, 3.8754660582175007`*^9}, 
+   3.8754660915826674`*^9, 3.8754665104779387`*^9, {3.8754671387991123`*^9, 
+   3.87546715993582*^9}, 3.875467309099029*^9, {3.875468105019074*^9, 
+   3.875468106304641*^9}},
+ CellLabel->"In[1]:=",ExpressionUUID->"bce32483-9517-4efc-9d22-e55a5b6c4fad"],
+
+Cell[BoxData[
+ RowBox[{
+  TagBox["\<\"Importing from GitHub:\"\>",
+   "EchoLabel"], "  ", "\<\"EpidemiologyModels.m\"\>"}]], "Echo",
+ CellChangeTimes->{
+  3.87547088646883*^9},ExpressionUUID->"c0cf35f2-8e52-4fd9-8d20-0617029ff8ba"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"modelSEIQR", "=", 
+   RowBox[{"SEIQRModel", "[", 
+    RowBox[{"t", ",", 
+     RowBox[{"\"\<InitialConditions\>\"", "->", "True"}], ",", 
+     RowBox[{"\"\<RateRules\>\"", "->", "True"}], ",", 
+     RowBox[{
+     "\"\<TotalPopulationRepresentation\>\"", "->", "\"\<Constant\>\""}]}], 
+    "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"ModelGridTableForm", "[", "modelSEIQR", "]"}]}], "Input",
+ CellChangeTimes->{{3.8754667257694407`*^9, 3.8754667257879343`*^9}, {
+  3.875468133035185*^9, 3.87546813392487*^9}, {3.875468164816783*^9, 
+  3.875468165811124*^9}},
+ CellLabel->"In[2]:=",ExpressionUUID->"600e405d-ac7c-4f3f-978e-102bd949709a"],
+
+Cell[BoxData[
+ RowBox[{"\[LeftAssociation]", 
+  RowBox[{
+   RowBox[{"\<\"Stocks\"\>", "\[Rule]", 
+    TagBox[GridBox[{
+       {
+        StyleBox["\<\"#\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Symbol\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Description\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]]},
+       {"1", 
+        RowBox[{"NP", "[", "t", "]"}], "\<\"Total Population\"\>"},
+       {"2", 
+        RowBox[{"SP", "[", "t", "]"}], "\<\"Susceptible Population\"\>"},
+       {"3", 
+        RowBox[{"EP", "[", "t", "]"}], "\<\"Exposed Population\"\>"},
+       {"4", 
+        RowBox[{"IP", "[", "t", "]"}], "\<\"Infected Population\"\>"},
+       {"5", 
+        RowBox[{"QP", "[", "t", "]"}], "\<\"Quarantined Population\"\>"},
+       {"6", 
+        RowBox[{"RP", "[", "t", "]"}], "\<\"Recovered Population\"\>"}
+      },
+      AutoDelete->False,
+      GridBoxAlignment->{"Columns" -> {{Left}}},
+      GridBoxBackground->{"Columns" -> {{Automatic}}, "Rows" -> {
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1]}},
+      GridBoxDividers->{
+       "ColumnsIndexed" -> {
+         1 -> GrayLevel[0], 2 -> GrayLevel[0], 3 -> GrayLevel[0.8], 4 -> 
+          GrayLevel[0.8], 4 -> GrayLevel[0]}, 
+        "Rows" -> {True, True, {False}, True}},
+      GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+     
+     "Grid"]}], ",", 
+   RowBox[{"\<\"Rates\"\>", "\[Rule]", 
+    TagBox[GridBox[{
+       {
+        StyleBox["\<\"#\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Symbol\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Description\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]]},
+       {"1", "\[Theta]", "\<\"Population Birth Rate\"\>"},
+       {"2", "\[Mu]", "\<\"Population Death rate\"\>"},
+       {"3", "\[Delta]", "\<\"Infected Population Death rate\"\>"},
+       {"4", "\[Beta]", "\<\"Contact rate for the infected population\"\>"},
+       {"5", 
+        "\[Alpha]1", "\<\"Proportion of Exposed to Infected Rate \
+(Confirmed)\"\>"},
+       {"6", "\[Alpha]2", "\<\"Proportion Sent to Quarantine (Suspected)\"\>"},
+       {"7", 
+        "\[CurlyPhi]", "\<\"Proportion of not detected after medical \
+diagnosis (Discarded)\"\>"},
+       {"8", "\[Tau]", "\<\"Proportion from Suspected to Recovered class\"\>"},
+       {"9", "\[Gamma]", "\<\"Recovery Rate\"\>"}
+      },
+      AutoDelete->False,
+      GridBoxAlignment->{"Columns" -> {{Left}}},
+      GridBoxBackground->{"Columns" -> {{Automatic}}, "Rows" -> {
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96]}},
+      GridBoxDividers->{
+       "ColumnsIndexed" -> {
+         1 -> GrayLevel[0], 2 -> GrayLevel[0], 3 -> GrayLevel[0.8], 4 -> 
+          GrayLevel[0.8], 4 -> GrayLevel[0]}, 
+        "Rows" -> {True, True, {False}, True}},
+      GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+     
+     "Grid"]}], ",", 
+   RowBox[{"\<\"Equations\"\>", "\[Rule]", 
+    TagBox[GridBox[{
+       {
+        StyleBox["\<\"#\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Equation\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]]},
+       {"1", 
+        RowBox[{
+         RowBox[{
+          SuperscriptBox["SP", "\[Prime]",
+           MultilineFunction->None], "[", "t", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[CurlyPhi]",
+               
+               "\"Proportion of not detected after medical diagnosis \
+(Discarded)\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, 
+               "Proportion of not detected after medical diagnosis \
+(Discarded)", "Tooltip"]& ],
+             
+             "\"Proportion of not detected after medical diagnosis \
+(Discarded)\"",
+             TooltipStyle->"TextStyling"],
+            
+            Annotation[#, 
+             "Proportion of not detected after medical diagnosis (Discarded)",
+              "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"QP", "[", "t", "]"}],
+               "\"Quarantined Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Quarantined Population", "Tooltip"]& ],
+             "\"Quarantined Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Quarantined Population", "Tooltip"]& ]}], "-", 
+          FractionBox[
+           RowBox[{
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox["\[Beta]",
+                "\"Contact rate for the infected population\"",
+                TooltipStyle->"TextStyling"],
+               
+               Annotation[#, "Contact rate for the infected population", 
+                "Tooltip"]& ],
+              "\"Contact rate for the infected population\"",
+              TooltipStyle->"TextStyling"],
+             
+             Annotation[#, "Contact rate for the infected population", 
+              "Tooltip"]& ], " ", 
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox[
+                RowBox[{"IP", "[", "t", "]"}],
+                "\"Infected Population\"",
+                TooltipStyle->"TextStyling"],
+               Annotation[#, "Infected Population", "Tooltip"]& ],
+              "\"Infected Population\"",
+              TooltipStyle->"TextStyling"],
+             Annotation[#, "Infected Population", "Tooltip"]& ], " ", 
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox[
+                RowBox[{"SP", "[", "t", "]"}],
+                "\"Susceptible Population\"",
+                TooltipStyle->"TextStyling"],
+               Annotation[#, "Susceptible Population", "Tooltip"]& ],
+              "\"Susceptible Population\"",
+              TooltipStyle->"TextStyling"],
+             Annotation[#, "Susceptible Population", "Tooltip"]& ]}], 
+           RowBox[{"NP", "[", "0", "]"}]]}]}]},
+       {"2", 
+        RowBox[{
+         RowBox[{
+          SuperscriptBox["EP", "\[Prime]",
+           MultilineFunction->None], "[", "t", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{"-", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{
+               TagBox[
+                TooltipBox[
+                 TagBox[
+                  TooltipBox["\[Alpha]1",
+                   "\"Proportion of Exposed to Infected Rate (Confirmed)\"",
+                   TooltipStyle->"TextStyling"],
+                  
+                  Annotation[#, 
+                   "Proportion of Exposed to Infected Rate (Confirmed)", 
+                   "Tooltip"]& ],
+                 "\"Proportion of Exposed to Infected Rate (Confirmed)\"",
+                 TooltipStyle->"TextStyling"],
+                
+                Annotation[#, 
+                 "Proportion of Exposed to Infected Rate (Confirmed)", 
+                 "Tooltip"]& ], "+", 
+               TagBox[
+                TooltipBox[
+                 TagBox[
+                  TooltipBox["\[Alpha]2",
+                   "\"Proportion Sent to Quarantine (Suspected)\"",
+                   TooltipStyle->"TextStyling"],
+                  
+                  Annotation[#, "Proportion Sent to Quarantine (Suspected)", 
+                   "Tooltip"]& ],
+                 "\"Proportion Sent to Quarantine (Suspected)\"",
+                 TooltipStyle->"TextStyling"],
+                
+                Annotation[#, "Proportion Sent to Quarantine (Suspected)", 
+                 "Tooltip"]& ]}], ")"}], " ", 
+             TagBox[
+              TooltipBox[
+               TagBox[
+                TooltipBox[
+                 RowBox[{"EP", "[", "t", "]"}],
+                 "\"Exposed Population\"",
+                 TooltipStyle->"TextStyling"],
+                Annotation[#, "Exposed Population", "Tooltip"]& ],
+               "\"Exposed Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Exposed Population", "Tooltip"]& ]}], ")"}]}], 
+          "+", 
+          FractionBox[
+           RowBox[{
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox["\[Beta]",
+                "\"Contact rate for the infected population\"",
+                TooltipStyle->"TextStyling"],
+               
+               Annotation[#, "Contact rate for the infected population", 
+                "Tooltip"]& ],
+              "\"Contact rate for the infected population\"",
+              TooltipStyle->"TextStyling"],
+             
+             Annotation[#, "Contact rate for the infected population", 
+              "Tooltip"]& ], " ", 
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox[
+                RowBox[{"IP", "[", "t", "]"}],
+                "\"Infected Population\"",
+                TooltipStyle->"TextStyling"],
+               Annotation[#, "Infected Population", "Tooltip"]& ],
+              "\"Infected Population\"",
+              TooltipStyle->"TextStyling"],
+             Annotation[#, "Infected Population", "Tooltip"]& ], " ", 
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox[
+                RowBox[{"SP", "[", "t", "]"}],
+                "\"Susceptible Population\"",
+                TooltipStyle->"TextStyling"],
+               Annotation[#, "Susceptible Population", "Tooltip"]& ],
+              "\"Susceptible Population\"",
+              TooltipStyle->"TextStyling"],
+             Annotation[#, "Susceptible Population", "Tooltip"]& ]}], 
+           RowBox[{"NP", "[", "0", "]"}]]}]}]},
+       {"3", 
+        RowBox[{
+         RowBox[{
+          SuperscriptBox["IP", "\[Prime]",
+           MultilineFunction->None], "[", "t", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[Alpha]1",
+               "\"Proportion of Exposed to Infected Rate (Confirmed)\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, 
+               "Proportion of Exposed to Infected Rate (Confirmed)", 
+               "Tooltip"]& ],
+             "\"Proportion of Exposed to Infected Rate (Confirmed)\"",
+             TooltipStyle->"TextStyling"],
+            
+            Annotation[#, 
+             "Proportion of Exposed to Infected Rate (Confirmed)", 
+             "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"EP", "[", "t", "]"}],
+               "\"Exposed Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Exposed Population", "Tooltip"]& ],
+             "\"Exposed Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Exposed Population", "Tooltip"]& ]}], "-", 
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[Gamma]",
+               "\"Recovery Rate\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Recovery Rate", "Tooltip"]& ],
+             "\"Recovery Rate\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Recovery Rate", "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"IP", "[", "t", "]"}],
+               "\"Infected Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Infected Population", "Tooltip"]& ],
+             "\"Infected Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Infected Population", "Tooltip"]& ]}]}]}]},
+       {"4", 
+        RowBox[{
+         RowBox[{
+          SuperscriptBox["QP", "\[Prime]",
+           MultilineFunction->None], "[", "t", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[Alpha]2",
+               "\"Proportion Sent to Quarantine (Suspected)\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, "Proportion Sent to Quarantine (Suspected)", 
+               "Tooltip"]& ],
+             "\"Proportion Sent to Quarantine (Suspected)\"",
+             TooltipStyle->"TextStyling"],
+            
+            Annotation[#, "Proportion Sent to Quarantine (Suspected)", 
+             "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"EP", "[", "t", "]"}],
+               "\"Exposed Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Exposed Population", "Tooltip"]& ],
+             "\"Exposed Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Exposed Population", "Tooltip"]& ]}], "-", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+             TagBox[
+              TooltipBox[
+               TagBox[
+                TooltipBox["\[Tau]",
+                 "\"Proportion from Suspected to Recovered class\"",
+                 TooltipStyle->"TextStyling"],
+                
+                Annotation[#, "Proportion from Suspected to Recovered class", 
+                 "Tooltip"]& ],
+               "\"Proportion from Suspected to Recovered class\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, "Proportion from Suspected to Recovered class", 
+               "Tooltip"]& ], "+", 
+             TagBox[
+              TooltipBox[
+               TagBox[
+                TooltipBox["\[CurlyPhi]",
+                 
+                 "\"Proportion of not detected after medical diagnosis \
+(Discarded)\"",
+                 TooltipStyle->"TextStyling"],
+                
+                Annotation[#, 
+                 "Proportion of not detected after medical diagnosis \
+(Discarded)", "Tooltip"]& ],
+               
+               "\"Proportion of not detected after medical diagnosis \
+(Discarded)\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, 
+               "Proportion of not detected after medical diagnosis \
+(Discarded)", "Tooltip"]& ]}], ")"}], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"QP", "[", "t", "]"}],
+               "\"Quarantined Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Quarantined Population", "Tooltip"]& ],
+             "\"Quarantined Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Quarantined Population", "Tooltip"]& ]}]}]}]},
+       {"5", 
+        RowBox[{
+         RowBox[{
+          SuperscriptBox["RP", "\[Prime]",
+           MultilineFunction->None], "[", "t", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[Gamma]",
+               "\"Recovery Rate\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Recovery Rate", "Tooltip"]& ],
+             "\"Recovery Rate\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Recovery Rate", "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"IP", "[", "t", "]"}],
+               "\"Infected Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Infected Population", "Tooltip"]& ],
+             "\"Infected Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Infected Population", "Tooltip"]& ]}], "+", 
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[Tau]",
+               "\"Proportion from Suspected to Recovered class\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, "Proportion from Suspected to Recovered class", 
+               "Tooltip"]& ],
+             "\"Proportion from Suspected to Recovered class\"",
+             TooltipStyle->"TextStyling"],
+            
+            Annotation[#, "Proportion from Suspected to Recovered class", 
+             "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"QP", "[", "t", "]"}],
+               "\"Quarantined Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Quarantined Population", "Tooltip"]& ],
+             "\"Quarantined Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Quarantined Population", "Tooltip"]& ]}]}]}]}
+      },
+      AutoDelete->False,
+      GridBoxAlignment->{"Columns" -> {{Left}}},
+      GridBoxBackground->{"Columns" -> {{Automatic}}, "Rows" -> {
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96]}},
+      GridBoxDividers->{
+       "ColumnsIndexed" -> {
+         1 -> GrayLevel[0], 2 -> GrayLevel[0], 3 -> GrayLevel[0.8], 3 -> 
+          GrayLevel[0]}, "Rows" -> {True, True, {False}, True}},
+      GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+     
+     "Grid"]}], ",", 
+   RowBox[{"\<\"RateRules\"\>", "\[Rule]", 
+    TagBox[GridBox[{
+       {
+        StyleBox["\<\"#\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Symbol\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Value\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]]},
+       {"1", 
+        TagBox[
+         TooltipBox["\[Theta]",
+          "\"Population Birth Rate\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Population Birth Rate", 
+          "Tooltip"]& ], "\<\"Population Birth Rate\"\>"},
+       {"2", 
+        TagBox[
+         TooltipBox["\[Mu]",
+          "\"Population Death rate\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Population Death rate", 
+          "Tooltip"]& ], "\<\"Population Death rate\"\>"},
+       {"3", 
+        TagBox[
+         TooltipBox["\[Beta]",
+          "\"Contact rate for the infected population\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Contact rate for the infected population", 
+          "Tooltip"]& ], "\<\"Contact rate for the infected population\"\>"},
+       {"4", 
+        TagBox[
+         TooltipBox["\[Alpha]1",
+          "\"Proportion of Exposed to Infected Rate (Confirmed)\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Proportion of Exposed to Infected Rate (Confirmed)", 
+          "Tooltip"]& ], "\<\"Proportion of Exposed to Infected Rate \
+(Confirmed)\"\>"},
+       {"5", 
+        TagBox[
+         TooltipBox["\[Alpha]2",
+          "\"Proportion Sent to Quarantine (Suspected)\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Proportion Sent to Quarantine (Suspected)", 
+          "Tooltip"]& ], "\<\"Proportion Sent to Quarantine \
+(Suspected)\"\>"},
+       {"6", 
+        TagBox[
+         TooltipBox["\[CurlyPhi]",
+          "\"Proportion of not detected after medical diagnosis (Discarded)\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, 
+          "Proportion of not detected after medical diagnosis (Discarded)", 
+          "Tooltip"]& ], "\<\"Proportion of not detected after medical \
+diagnosis (Discarded)\"\>"},
+       {"7", 
+        TagBox[
+         TooltipBox["\[Tau]",
+          "\"Proportion from Suspected to Recovered class\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Proportion from Suspected to Recovered class", 
+          "Tooltip"]& ], "\<\"Proportion from Suspected to Recovered \
+class\"\>"},
+       {"8", 
+        TagBox[
+         TooltipBox["\[Gamma]",
+          "\"Recovery Rate\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Recovery Rate", "Tooltip"]& ], "\<\"Recovery Rate\"\>"}
+      },
+      AutoDelete->False,
+      GridBoxAlignment->{"Columns" -> {{Left}}},
+      GridBoxBackground->{"Columns" -> {{Automatic}}, "Rows" -> {
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1]}},
+      GridBoxDividers->{
+       "ColumnsIndexed" -> {
+         1 -> GrayLevel[0], 2 -> GrayLevel[0], 3 -> GrayLevel[0.8], 4 -> 
+          GrayLevel[0.8], 4 -> GrayLevel[0]}, 
+        "Rows" -> {True, True, {False}, True}},
+      GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+     
+     "Grid"]}], ",", 
+   RowBox[{"\<\"InitialConditions\"\>", "\[Rule]", 
+    TagBox[GridBox[{
+       {
+        StyleBox["\<\"#\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Equation\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]]},
+       {"1", 
+        RowBox[{
+         RowBox[{"SP", "[", "0", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{"-", "1"}], "+", 
+          RowBox[{"NP", "[", "0", "]"}]}]}]},
+       {"2", 
+        RowBox[{
+         RowBox[{"EP", "[", "0", "]"}], "\[Equal]", "0"}]},
+       {"3", 
+        RowBox[{
+         RowBox[{"IP", "[", "0", "]"}], "\[Equal]", "1"}]},
+       {"4", 
+        RowBox[{
+         RowBox[{"QP", "[", "0", "]"}], "\[Equal]", "0"}]},
+       {"5", 
+        RowBox[{
+         RowBox[{"RP", "[", "0", "]"}], "\[Equal]", "0"}]}
+      },
+      AutoDelete->False,
+      GridBoxAlignment->{"Columns" -> {{Left}}},
+      GridBoxBackground->{"Columns" -> {{Automatic}}, "Rows" -> {
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96]}},
+      GridBoxDividers->{
+       "ColumnsIndexed" -> {
+         1 -> GrayLevel[0], 2 -> GrayLevel[0], 3 -> GrayLevel[0.8], 3 -> 
+          GrayLevel[0]}, "Rows" -> {True, True, {False}, True}},
+      GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+     
+     "Grid"]}]}], "\[RightAssociation]"}]], "Output",
+ CellChangeTimes->{3.875470889440607*^9},
+ CellLabel->"Out[3]=",ExpressionUUID->"30f4eb6c-5c00-446c-8503-de209b1d4b9a"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "General", "stop", 
+   "\"Further output of \\!\\(\\*StyleBox[RowBox[{\\\"Set\\\", \\\"::\\\", \\\
+\"write\\\"}], \\\"MessageName\\\"]\\) will be suppressed during this \
+calculation.\"", 2, 2, 4, 25410496805486542511, "Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{
+  3.875469626774557*^9, {3.875470737877544*^9, 3.875470742647038*^9}, 
+   3.875470772810154*^9, 3.875470889416173*^9},
+ CellLabel->
+  "During evaluation of \
+In[2]:=",ExpressionUUID->"b3e3a3f1-4db3-40fc-8884-995fca782a57"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "Set", "write", 
+   "\"Tag \\!\\(\\*RowBox[{\\\"Times\\\"}]\\) in \
+\\!\\(\\*RowBox[{RowBox[{\\\"\[LeftAssociation]\\\", RowBox[{RowBox[{\\\"\
+\[Theta]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Population Birth \
+Rate\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Mu]\\\", \\\"\[Rule]\\\", \\\"\\\
+\\\\\"Population Death rate\\\\\\\"\\\"}], \\\",\\\", \
+RowBox[{\\\"\[Delta]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Infected Population \
+Death rate\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Beta]\\\", \
+\\\"\[Rule]\\\", \\\"\\\\\\\"Contact rate for the infected population\\\\\\\"\
+\\\"}], \\\",\\\", RowBox[{\\\"\[Alpha]1\\\", \\\"\[Rule]\\\", RowBox[{\\\"\\\
+\\\\\"Pro\\\\\\\"\\\", \\\"\[Ellipsis]\\\", \\\"\\\\\\\"ed)\\\\\\\"\\\"}]}], \
+\\\",\\\", RowBox[{\\\"\[Alpha]2\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion \
+Sent to Quarantine (Suspected)\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\
+\[CurlyPhi]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion of not detected \
+after medical diagnosis (Discarded)\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\
+\[Tau]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion from Suspected to \
+Recovered class\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Gamma]\\\", \\\"\
+\[Rule]\\\", \\\"\\\\\\\"Recovery Rate\\\\\\\"\\\"}]}], \\\"\
+\[RightAssociation]\\\"}], \\\" \\\", RowBox[{\\\"\[LeftAssociation]\\\", \
+RowBox[{\\\"\[LeftSkeleton]\\\", \\\"1\\\", \\\"\[RightSkeleton]\\\"}], \\\"\
+\[RightAssociation]\\\"}]}]\\) is Protected.\"", 2, 2, 3, 
+   25410496805486542511, "Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{
+  3.875469626774557*^9, {3.875470737877544*^9, 3.875470742647038*^9}, 
+   3.875470772810154*^9, 3.875470889390491*^9},
+ CellLabel->
+  "During evaluation of \
+In[2]:=",ExpressionUUID->"00505d64-4607-455d-b694-f988b7a9c271"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "Set", "write", 
+   "\"Tag \\!\\(\\*RowBox[{\\\"Times\\\"}]\\) in \
+\\!\\(\\*RowBox[{RowBox[{\\\"\[LeftAssociation]\\\", RowBox[{RowBox[{\\\"\
+\[Theta]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Population Birth \
+Rate\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Mu]\\\", \\\"\[Rule]\\\", \\\"\\\
+\\\\\"Population Death rate\\\\\\\"\\\"}], \\\",\\\", \
+RowBox[{\\\"\[Delta]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Infected Population \
+Death rate\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Beta]\\\", \
+\\\"\[Rule]\\\", \\\"\\\\\\\"Contact rate for the infected population\\\\\\\"\
+\\\"}], \\\",\\\", RowBox[{\\\"\[Alpha]1\\\", \\\"\[Rule]\\\", RowBox[{\\\"\\\
+\\\\\"Pro\\\\\\\"\\\", \\\"\[Ellipsis]\\\", \\\"\\\\\\\"ed)\\\\\\\"\\\"}]}], \
+\\\",\\\", RowBox[{\\\"\[Alpha]2\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion \
+Sent to Quarantine (Suspected)\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\
+\[CurlyPhi]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion of not detected \
+after medical diagnosis (Discarded)\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\
+\[Tau]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion from Suspected to \
+Recovered class\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Gamma]\\\", \\\"\
+\[Rule]\\\", \\\"\\\\\\\"Recovery Rate\\\\\\\"\\\"}]}], \\\"\
+\[RightAssociation]\\\"}], \\\" \\\", RowBox[{\\\"\[LeftAssociation]\\\", \
+RowBox[{\\\"\[LeftSkeleton]\\\", \\\"1\\\", \\\"\[RightSkeleton]\\\"}], \\\"\
+\[RightAssociation]\\\"}]}]\\) is Protected.\"", 2, 2, 2, 
+   25410496805486542511, "Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{
+  3.875469626774557*^9, {3.875470737877544*^9, 3.875470742647038*^9}, 
+   3.875470772810154*^9, 3.8754708893667393`*^9},
+ CellLabel->
+  "During evaluation of \
+In[2]:=",ExpressionUUID->"dd337f73-e066-4ed2-b72b-94a47aca3c8f"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "Set", "write", 
+   "\"Tag \\!\\(\\*RowBox[{\\\"Times\\\"}]\\) in \
+\\!\\(\\*RowBox[{RowBox[{\\\"\[LeftAssociation]\\\", RowBox[{RowBox[{\\\"\
+\[Theta]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Population Birth \
+Rate\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Delta]\\\", \\\"\[Rule]\\\", \
+\\\"\\\\\\\"Infected Population Death rate\\\\\\\"\\\"}], \\\",\\\", RowBox[{\
+\\\"\[Beta]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Contact rate for the infected \
+population\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Alpha]1\\\", \\\"\[Rule]\\\
+\", \\\"\\\\\\\"Proportion of Exposed to Infected Rate \
+(Confirmed)\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Alpha]2\\\", \
+\\\"\[Rule]\\\", RowBox[{\\\"\\\\\\\"Proportion\\\\\\\"\\\", \
+\\\"\[Ellipsis]\\\", \\\"\\\\\\\"Suspected)\\\\\\\"\\\"}]}], \\\",\\\", \
+RowBox[{\\\"\[CurlyPhi]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion of not \
+detected after medical diagnosis (Discarded)\\\\\\\"\\\"}], \\\",\\\", \
+RowBox[{\\\"\[Tau]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion from \
+Suspected to Recovered class\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Gamma]\\\
+\", \\\"\[Rule]\\\", \\\"\\\\\\\"Recovery Rate\\\\\\\"\\\"}]}], \\\"\
+\[RightAssociation]\\\"}], \\\" \\\", RowBox[{\\\"\[LeftAssociation]\\\", \
+RowBox[{\\\"\[LeftSkeleton]\\\", \\\"1\\\", \\\"\[RightSkeleton]\\\"}], \\\"\
+\[RightAssociation]\\\"}]}]\\) is Protected.\"", 2, 2, 1, 
+   25410496805486542511, "Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{
+  3.875469626774557*^9, {3.875470737877544*^9, 3.875470742647038*^9}, 
+   3.875470772810154*^9, 3.875470889339238*^9},
+ CellLabel->
+  "During evaluation of \
+In[2]:=",ExpressionUUID->"23d3eaa3-93ee-4ba1-8f81-c74a2276e19c"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "Set", "write", 
+   "\:f3b5Tag Times in \!\(\[LeftAssociation]\[Theta] \[Rule] \
+\\\"\\<Population Birth Rate\\>\\\", \[Delta] \[Rule] \\\"\\<Infected \
+Population Death rate\\>\\\", \[Beta] \[Rule] \\\"\\<Contact rate for the \
+infected population\\>\\\", \[Alpha]1 \[Rule] \\\"\\<Proportion of Exposed to \
+Infected Rate (Confirmed)\\>\\\", \[Alpha]2 \[Rule] \\\"\\<Proportion\\>\\\" \
+\[Ellipsis] \\\"\\<Suspected)\\>\\\", \[CurlyPhi] \[Rule] \\\"\\<Proportion \
+of not detected after medical diagnosis (Discarded)\\>\\\", \[Tau] \[Rule] \\\
+\"\\<Proportion from Suspected to Recovered class\\>\\\", \[Gamma] \[Rule] \\\
+\"\\<Recovery Rate\\>\\\"\[RightAssociation]\\\\\\ \[LeftAssociation]\
+\[LeftSkeleton]1\[RightSkeleton]\[RightAssociation]\) is Protected.\:f3b5", 2,
+    12, 13, 25410478311056517288, "Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{
+  3.875469626774557*^9, {3.875470737877544*^9, 3.875470742647038*^9}, 
+   3.875470772810154*^9},ExpressionUUID->"fa226aaa-197b-4594-b015-\
+e3e73e8c9ab2"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "Set", "write", 
+   "\"Tag \\!\\(\\*RowBox[{\\\"Times\\\"}]\\) in \
+\\!\\(\\*RowBox[{RowBox[{\\\"\[LeftAssociation]\\\", RowBox[{RowBox[{\\\"\
+\[Theta]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Population Birth \
+Rate\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Mu]\\\", \\\"\[Rule]\\\", \\\"\\\
+\\\\\"Population Death rate\\\\\\\"\\\"}], \\\",\\\", \
+RowBox[{\\\"\[Delta]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Infected Population \
+Death rate\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Beta]\\\", \
+\\\"\[Rule]\\\", \\\"\\\\\\\"Contact rate for the infected population\\\\\\\"\
+\\\"}], \\\",\\\", RowBox[{\\\"\[Alpha]1\\\", \\\"\[Rule]\\\", RowBox[{\\\"\\\
+\\\\\"Pro\\\\\\\"\\\", \\\"\[Ellipsis]\\\", \\\"\\\\\\\"ed)\\\\\\\"\\\"}]}], \
+\\\",\\\", RowBox[{\\\"\[Alpha]2\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion \
+Sent to Quarantine (Suspected)\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\
+\[CurlyPhi]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion of not detected \
+after medical diagnosis (Discarded)\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\
+\[Tau]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion from Suspected to \
+Recovered class\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Gamma]\\\", \\\"\
+\[Rule]\\\", \\\"\\\\\\\"Recovery Rate\\\\\\\"\\\"}]}], \\\"\
+\[RightAssociation]\\\"}], \\\" \\\", RowBox[{\\\"\[LeftAssociation]\\\", \
+RowBox[{\\\"\[LeftSkeleton]\\\", \\\"1\\\", \\\"\[RightSkeleton]\\\"}], \\\"\
+\[RightAssociation]\\\"}]}]\\) is Protected.\"", 2, 12, 14, 
+   25410478311056517288, "Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ CellChangeTimes->{
+  3.875469626774557*^9, {3.875470737877544*^9, 3.875470742666615*^9}},
+ CellLabel->
+  "During evaluation of \
+In[12]:=",ExpressionUUID->"231adb0c-2410-4a04-8ac2-76330a2d7596"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "Set", "write", 
+   "\"Tag \\!\\(\\*RowBox[{\\\"Times\\\"}]\\) in \
+\\!\\(\\*RowBox[{RowBox[{\\\"\[LeftAssociation]\\\", RowBox[{RowBox[{\\\"\
+\[Theta]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Population Birth \
+Rate\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Mu]\\\", \\\"\[Rule]\\\", \\\"\\\
+\\\\\"Population Death rate\\\\\\\"\\\"}], \\\",\\\", \
+RowBox[{\\\"\[Delta]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Infected Population \
+Death rate\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Beta]\\\", \
+\\\"\[Rule]\\\", \\\"\\\\\\\"Contact rate for the infected population\\\\\\\"\
+\\\"}], \\\",\\\", RowBox[{\\\"\[Alpha]1\\\", \\\"\[Rule]\\\", RowBox[{\\\"\\\
+\\\\\"Pro\\\\\\\"\\\", \\\"\[Ellipsis]\\\", \\\"\\\\\\\"ed)\\\\\\\"\\\"}]}], \
+\\\",\\\", RowBox[{\\\"\[Alpha]2\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion \
+Sent to Quarantine (Suspected)\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\
+\[CurlyPhi]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion of not detected \
+after medical diagnosis (Discarded)\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\
+\[Tau]\\\", \\\"\[Rule]\\\", \\\"\\\\\\\"Proportion from Suspected to \
+Recovered class\\\\\\\"\\\"}], \\\",\\\", RowBox[{\\\"\[Gamma]\\\", \\\"\
+\[Rule]\\\", \\\"\\\\\\\"Recovery Rate\\\\\\\"\\\"}]}], \\\"\
+\[RightAssociation]\\\"}], \\\" \\\", RowBox[{\\\"\[LeftAssociation]\\\", \
+RowBox[{\\\"\[LeftSkeleton]\\\", \\\"1\\\", \\\"\[RightSkeleton]\\\"}], \\\"\
+\[RightAssociation]\\\"}]}]\\) is Protected.\"", 2, 12, 15, 
+   25410478311056517288, "Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ CellChangeTimes->{
+  3.875469626774557*^9, {3.875470737877544*^9, 3.875470742680591*^9}},
+ CellLabel->
+  "During evaluation of \
+In[12]:=",ExpressionUUID->"2398d953-6907-40ab-90a0-7ba71af84fbf"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "General", "stop", 
+   "\"Further output of \\!\\(\\*StyleBox[RowBox[{\\\"Set\\\", \\\"::\\\", \\\
+\"write\\\"}], \\\"MessageName\\\"]\\) will be suppressed during this \
+calculation.\"", 2, 12, 16, 25410478311056517288, "Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ CellChangeTimes->{
+  3.875469626774557*^9, {3.875470737877544*^9, 3.875470742693899*^9}},
+ CellLabel->
+  "During evaluation of \
+In[12]:=",ExpressionUUID->"483c4c18-91e9-44e0-a4a2-271bfac97aa9"],
+
+Cell[BoxData[
+ RowBox[{"\[LeftAssociation]", 
+  RowBox[{
+   RowBox[{"\<\"Stocks\"\>", "\[Rule]", 
+    TagBox[GridBox[{
+       {
+        StyleBox["\<\"#\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Symbol\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Description\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]]},
+       {"1", 
+        RowBox[{"NP", "[", "t", "]"}], "\<\"Total Population\"\>"},
+       {"2", 
+        RowBox[{"SP", "[", "t", "]"}], "\<\"Susceptible Population\"\>"},
+       {"3", 
+        RowBox[{"EP", "[", "t", "]"}], "\<\"Exposed Population\"\>"},
+       {"4", 
+        RowBox[{"IP", "[", "t", "]"}], "\<\"Infected Population\"\>"},
+       {"5", 
+        RowBox[{"QP", "[", "t", "]"}], "\<\"Quarantined Population\"\>"},
+       {"6", 
+        RowBox[{"RP", "[", "t", "]"}], "\<\"Recovered Population\"\>"}
+      },
+      AutoDelete->False,
+      GridBoxAlignment->{"Columns" -> {{Left}}},
+      GridBoxBackground->{"Columns" -> {{Automatic}}, "Rows" -> {
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1]}},
+      GridBoxDividers->{
+       "ColumnsIndexed" -> {
+         1 -> GrayLevel[0], 2 -> GrayLevel[0], 3 -> GrayLevel[0.8], 4 -> 
+          GrayLevel[0.8], 4 -> GrayLevel[0]}, 
+        "Rows" -> {True, True, {False}, True}},
+      GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+     
+     "Grid"]}], ",", 
+   RowBox[{"\<\"Rates\"\>", "\[Rule]", 
+    TagBox[GridBox[{
+       {
+        StyleBox["\<\"#\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Symbol\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Description\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]]},
+       {"1", "\[Theta]", "\<\"Population Birth Rate\"\>"},
+       {"2", "\[Mu]", "\<\"Population Death rate\"\>"},
+       {"3", "\[Delta]", "\<\"Infected Population Death rate\"\>"},
+       {"4", "\[Beta]", "\<\"Contact rate for the infected population\"\>"},
+       {"5", 
+        "\[Alpha]1", "\<\"Proportion of Exposed to Infected Rate \
+(Confirmed)\"\>"},
+       {"6", "\[Alpha]2", "\<\"Proportion Sent to Quarantine (Suspected)\"\>"},
+       {"7", 
+        "\[CurlyPhi]", "\<\"Proportion of not detected after medical \
+diagnosis (Discarded)\"\>"},
+       {"8", "\[Tau]", "\<\"Proportion from Suspected to Recovered class\"\>"},
+       {"9", "\[Gamma]", "\<\"Recovery Rate\"\>"}
+      },
+      AutoDelete->False,
+      GridBoxAlignment->{"Columns" -> {{Left}}},
+      GridBoxBackground->{"Columns" -> {{Automatic}}, "Rows" -> {
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96]}},
+      GridBoxDividers->{
+       "ColumnsIndexed" -> {
+         1 -> GrayLevel[0], 2 -> GrayLevel[0], 3 -> GrayLevel[0.8], 4 -> 
+          GrayLevel[0.8], 4 -> GrayLevel[0]}, 
+        "Rows" -> {True, True, {False}, True}},
+      GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+     
+     "Grid"]}], ",", 
+   RowBox[{"\<\"Equations\"\>", "\[Rule]", 
+    TagBox[GridBox[{
+       {
+        StyleBox["\<\"#\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Equation\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]]},
+       {"1", 
+        RowBox[{
+         RowBox[{
+          SuperscriptBox["SP", "\[Prime]",
+           MultilineFunction->None], "[", "t", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[CurlyPhi]",
+               
+               "\"Proportion of not detected after medical diagnosis \
+(Discarded)\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, 
+               "Proportion of not detected after medical diagnosis \
+(Discarded)", "Tooltip"]& ],
+             
+             "\"Proportion of not detected after medical diagnosis \
+(Discarded)\"",
+             TooltipStyle->"TextStyling"],
+            
+            Annotation[#, 
+             "Proportion of not detected after medical diagnosis (Discarded)",
+              "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"QP", "[", "t", "]"}],
+               "\"Quarantined Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Quarantined Population", "Tooltip"]& ],
+             "\"Quarantined Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Quarantined Population", "Tooltip"]& ]}], "-", 
+          FractionBox[
+           RowBox[{
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox["\[Beta]",
+                "\"Contact rate for the infected population\"",
+                TooltipStyle->"TextStyling"],
+               
+               Annotation[#, "Contact rate for the infected population", 
+                "Tooltip"]& ],
+              "\"Contact rate for the infected population\"",
+              TooltipStyle->"TextStyling"],
+             
+             Annotation[#, "Contact rate for the infected population", 
+              "Tooltip"]& ], " ", 
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox[
+                RowBox[{"IP", "[", "t", "]"}],
+                "\"Infected Population\"",
+                TooltipStyle->"TextStyling"],
+               Annotation[#, "Infected Population", "Tooltip"]& ],
+              "\"Infected Population\"",
+              TooltipStyle->"TextStyling"],
+             Annotation[#, "Infected Population", "Tooltip"]& ], " ", 
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox[
+                RowBox[{"SP", "[", "t", "]"}],
+                "\"Susceptible Population\"",
+                TooltipStyle->"TextStyling"],
+               Annotation[#, "Susceptible Population", "Tooltip"]& ],
+              "\"Susceptible Population\"",
+              TooltipStyle->"TextStyling"],
+             Annotation[#, "Susceptible Population", "Tooltip"]& ]}], 
+           RowBox[{"NP", "[", "0", "]"}]]}]}]},
+       {"2", 
+        RowBox[{
+         RowBox[{
+          SuperscriptBox["EP", "\[Prime]",
+           MultilineFunction->None], "[", "t", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{"-", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{
+               TagBox[
+                TooltipBox[
+                 TagBox[
+                  TooltipBox["\[Alpha]1",
+                   "\"Proportion of Exposed to Infected Rate (Confirmed)\"",
+                   TooltipStyle->"TextStyling"],
+                  
+                  Annotation[#, 
+                   "Proportion of Exposed to Infected Rate (Confirmed)", 
+                   "Tooltip"]& ],
+                 "\"Proportion of Exposed to Infected Rate (Confirmed)\"",
+                 TooltipStyle->"TextStyling"],
+                
+                Annotation[#, 
+                 "Proportion of Exposed to Infected Rate (Confirmed)", 
+                 "Tooltip"]& ], "+", 
+               TagBox[
+                TooltipBox[
+                 TagBox[
+                  TooltipBox["\[Alpha]2",
+                   "\"Proportion Sent to Quarantine (Suspected)\"",
+                   TooltipStyle->"TextStyling"],
+                  
+                  Annotation[#, "Proportion Sent to Quarantine (Suspected)", 
+                   "Tooltip"]& ],
+                 "\"Proportion Sent to Quarantine (Suspected)\"",
+                 TooltipStyle->"TextStyling"],
+                
+                Annotation[#, "Proportion Sent to Quarantine (Suspected)", 
+                 "Tooltip"]& ]}], ")"}], " ", 
+             TagBox[
+              TooltipBox[
+               TagBox[
+                TooltipBox[
+                 RowBox[{"EP", "[", "t", "]"}],
+                 "\"Exposed Population\"",
+                 TooltipStyle->"TextStyling"],
+                Annotation[#, "Exposed Population", "Tooltip"]& ],
+               "\"Exposed Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Exposed Population", "Tooltip"]& ]}], ")"}]}], 
+          "+", 
+          FractionBox[
+           RowBox[{
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox["\[Beta]",
+                "\"Contact rate for the infected population\"",
+                TooltipStyle->"TextStyling"],
+               
+               Annotation[#, "Contact rate for the infected population", 
+                "Tooltip"]& ],
+              "\"Contact rate for the infected population\"",
+              TooltipStyle->"TextStyling"],
+             
+             Annotation[#, "Contact rate for the infected population", 
+              "Tooltip"]& ], " ", 
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox[
+                RowBox[{"IP", "[", "t", "]"}],
+                "\"Infected Population\"",
+                TooltipStyle->"TextStyling"],
+               Annotation[#, "Infected Population", "Tooltip"]& ],
+              "\"Infected Population\"",
+              TooltipStyle->"TextStyling"],
+             Annotation[#, "Infected Population", "Tooltip"]& ], " ", 
+            TagBox[
+             TooltipBox[
+              TagBox[
+               TooltipBox[
+                RowBox[{"SP", "[", "t", "]"}],
+                "\"Susceptible Population\"",
+                TooltipStyle->"TextStyling"],
+               Annotation[#, "Susceptible Population", "Tooltip"]& ],
+              "\"Susceptible Population\"",
+              TooltipStyle->"TextStyling"],
+             Annotation[#, "Susceptible Population", "Tooltip"]& ]}], 
+           RowBox[{"NP", "[", "0", "]"}]]}]}]},
+       {"3", 
+        RowBox[{
+         RowBox[{
+          SuperscriptBox["IP", "\[Prime]",
+           MultilineFunction->None], "[", "t", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[Alpha]1",
+               "\"Proportion of Exposed to Infected Rate (Confirmed)\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, 
+               "Proportion of Exposed to Infected Rate (Confirmed)", 
+               "Tooltip"]& ],
+             "\"Proportion of Exposed to Infected Rate (Confirmed)\"",
+             TooltipStyle->"TextStyling"],
+            
+            Annotation[#, 
+             "Proportion of Exposed to Infected Rate (Confirmed)", 
+             "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"EP", "[", "t", "]"}],
+               "\"Exposed Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Exposed Population", "Tooltip"]& ],
+             "\"Exposed Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Exposed Population", "Tooltip"]& ]}], "-", 
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[Gamma]",
+               "\"Recovery Rate\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Recovery Rate", "Tooltip"]& ],
+             "\"Recovery Rate\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Recovery Rate", "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"IP", "[", "t", "]"}],
+               "\"Infected Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Infected Population", "Tooltip"]& ],
+             "\"Infected Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Infected Population", "Tooltip"]& ]}]}]}]},
+       {"4", 
+        RowBox[{
+         RowBox[{
+          SuperscriptBox["QP", "\[Prime]",
+           MultilineFunction->None], "[", "t", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[Alpha]2",
+               "\"Proportion Sent to Quarantine (Suspected)\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, "Proportion Sent to Quarantine (Suspected)", 
+               "Tooltip"]& ],
+             "\"Proportion Sent to Quarantine (Suspected)\"",
+             TooltipStyle->"TextStyling"],
+            
+            Annotation[#, "Proportion Sent to Quarantine (Suspected)", 
+             "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"EP", "[", "t", "]"}],
+               "\"Exposed Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Exposed Population", "Tooltip"]& ],
+             "\"Exposed Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Exposed Population", "Tooltip"]& ]}], "-", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+             TagBox[
+              TooltipBox[
+               TagBox[
+                TooltipBox["\[Tau]",
+                 "\"Proportion from Suspected to Recovered class\"",
+                 TooltipStyle->"TextStyling"],
+                
+                Annotation[#, "Proportion from Suspected to Recovered class", 
+                 "Tooltip"]& ],
+               "\"Proportion from Suspected to Recovered class\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, "Proportion from Suspected to Recovered class", 
+               "Tooltip"]& ], "+", 
+             TagBox[
+              TooltipBox[
+               TagBox[
+                TooltipBox["\[CurlyPhi]",
+                 
+                 "\"Proportion of not detected after medical diagnosis \
+(Discarded)\"",
+                 TooltipStyle->"TextStyling"],
+                
+                Annotation[#, 
+                 "Proportion of not detected after medical diagnosis \
+(Discarded)", "Tooltip"]& ],
+               
+               "\"Proportion of not detected after medical diagnosis \
+(Discarded)\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, 
+               "Proportion of not detected after medical diagnosis \
+(Discarded)", "Tooltip"]& ]}], ")"}], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"QP", "[", "t", "]"}],
+               "\"Quarantined Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Quarantined Population", "Tooltip"]& ],
+             "\"Quarantined Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Quarantined Population", "Tooltip"]& ]}]}]}]},
+       {"5", 
+        RowBox[{
+         RowBox[{
+          SuperscriptBox["RP", "\[Prime]",
+           MultilineFunction->None], "[", "t", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[Gamma]",
+               "\"Recovery Rate\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Recovery Rate", "Tooltip"]& ],
+             "\"Recovery Rate\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Recovery Rate", "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"IP", "[", "t", "]"}],
+               "\"Infected Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Infected Population", "Tooltip"]& ],
+             "\"Infected Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Infected Population", "Tooltip"]& ]}], "+", 
+          RowBox[{
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox["\[Tau]",
+               "\"Proportion from Suspected to Recovered class\"",
+               TooltipStyle->"TextStyling"],
+              
+              Annotation[#, "Proportion from Suspected to Recovered class", 
+               "Tooltip"]& ],
+             "\"Proportion from Suspected to Recovered class\"",
+             TooltipStyle->"TextStyling"],
+            
+            Annotation[#, "Proportion from Suspected to Recovered class", 
+             "Tooltip"]& ], " ", 
+           TagBox[
+            TooltipBox[
+             TagBox[
+              TooltipBox[
+               RowBox[{"QP", "[", "t", "]"}],
+               "\"Quarantined Population\"",
+               TooltipStyle->"TextStyling"],
+              Annotation[#, "Quarantined Population", "Tooltip"]& ],
+             "\"Quarantined Population\"",
+             TooltipStyle->"TextStyling"],
+            Annotation[#, "Quarantined Population", "Tooltip"]& ]}]}]}]}
+      },
+      AutoDelete->False,
+      GridBoxAlignment->{"Columns" -> {{Left}}},
+      GridBoxBackground->{"Columns" -> {{Automatic}}, "Rows" -> {
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96]}},
+      GridBoxDividers->{
+       "ColumnsIndexed" -> {
+         1 -> GrayLevel[0], 2 -> GrayLevel[0], 3 -> GrayLevel[0.8], 3 -> 
+          GrayLevel[0]}, "Rows" -> {True, True, {False}, True}},
+      GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+     
+     "Grid"]}], ",", 
+   RowBox[{"\<\"RateRules\"\>", "\[Rule]", 
+    TagBox[GridBox[{
+       {
+        StyleBox["\<\"#\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Symbol\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Value\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]]},
+       {"1", 
+        TagBox[
+         TooltipBox["\[Theta]",
+          "\"Population Birth Rate\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Population Birth Rate", 
+          "Tooltip"]& ], "\<\"Population Birth Rate\"\>"},
+       {"2", 
+        TagBox[
+         TooltipBox["\[Mu]",
+          "\"Population Death rate\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Population Death rate", 
+          "Tooltip"]& ], "\<\"Population Death rate\"\>"},
+       {"3", 
+        TagBox[
+         TooltipBox["\[Beta]",
+          "\"Contact rate for the infected population\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Contact rate for the infected population", 
+          "Tooltip"]& ], "\<\"Contact rate for the infected population\"\>"},
+       {"4", 
+        TagBox[
+         TooltipBox["\[Alpha]1",
+          "\"Proportion of Exposed to Infected Rate (Confirmed)\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Proportion of Exposed to Infected Rate (Confirmed)", 
+          "Tooltip"]& ], "\<\"Proportion of Exposed to Infected Rate \
+(Confirmed)\"\>"},
+       {"5", 
+        TagBox[
+         TooltipBox["\[Alpha]2",
+          "\"Proportion Sent to Quarantine (Suspected)\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Proportion Sent to Quarantine (Suspected)", 
+          "Tooltip"]& ], "\<\"Proportion Sent to Quarantine \
+(Suspected)\"\>"},
+       {"6", 
+        TagBox[
+         TooltipBox["\[CurlyPhi]",
+          "\"Proportion of not detected after medical diagnosis (Discarded)\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, 
+          "Proportion of not detected after medical diagnosis (Discarded)", 
+          "Tooltip"]& ], "\<\"Proportion of not detected after medical \
+diagnosis (Discarded)\"\>"},
+       {"7", 
+        TagBox[
+         TooltipBox["\[Tau]",
+          "\"Proportion from Suspected to Recovered class\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Proportion from Suspected to Recovered class", 
+          "Tooltip"]& ], "\<\"Proportion from Suspected to Recovered \
+class\"\>"},
+       {"8", 
+        TagBox[
+         TooltipBox["\[Gamma]",
+          "\"Recovery Rate\"",
+          TooltipStyle->"TextStyling"],
+         Annotation[#, "Recovery Rate", "Tooltip"]& ], "\<\"Recovery Rate\"\>"}
+      },
+      AutoDelete->False,
+      GridBoxAlignment->{"Columns" -> {{Left}}},
+      GridBoxBackground->{"Columns" -> {{Automatic}}, "Rows" -> {
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1]}},
+      GridBoxDividers->{
+       "ColumnsIndexed" -> {
+         1 -> GrayLevel[0], 2 -> GrayLevel[0], 3 -> GrayLevel[0.8], 4 -> 
+          GrayLevel[0.8], 4 -> GrayLevel[0]}, 
+        "Rows" -> {True, True, {False}, True}},
+      GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+     
+     "Grid"]}], ",", 
+   RowBox[{"\<\"InitialConditions\"\>", "\[Rule]", 
+    TagBox[GridBox[{
+       {
+        StyleBox["\<\"#\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox["\<\"Equation\"\>",
+         StripOnInput->False,
+         LineColor->RGBColor[0, 0, 1],
+         FrontFaceColor->RGBColor[0, 0, 1],
+         BackFaceColor->RGBColor[0, 0, 1],
+         GraphicsColor->RGBColor[0, 0, 1],
+         FontFamily->"Times",
+         FontColor->RGBColor[0, 0, 1]]},
+       {"1", 
+        RowBox[{
+         RowBox[{"SP", "[", "0", "]"}], "\[Equal]", 
+         RowBox[{
+          RowBox[{"-", "1"}], "+", 
+          RowBox[{"NP", "[", "0", "]"}]}]}]},
+       {"2", 
+        RowBox[{
+         RowBox[{"EP", "[", "0", "]"}], "\[Equal]", "0"}]},
+       {"3", 
+        RowBox[{
+         RowBox[{"IP", "[", "0", "]"}], "\[Equal]", "1"}]},
+       {"4", 
+        RowBox[{
+         RowBox[{"QP", "[", "0", "]"}], "\[Equal]", "0"}]},
+       {"5", 
+        RowBox[{
+         RowBox[{"RP", "[", "0", "]"}], "\[Equal]", "0"}]}
+      },
+      AutoDelete->False,
+      GridBoxAlignment->{"Columns" -> {{Left}}},
+      GridBoxBackground->{"Columns" -> {{Automatic}}, "Rows" -> {
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96], 
+          GrayLevel[1], 
+          GrayLevel[0.96]}},
+      GridBoxDividers->{
+       "ColumnsIndexed" -> {
+         1 -> GrayLevel[0], 2 -> GrayLevel[0], 3 -> GrayLevel[0.8], 3 -> 
+          GrayLevel[0]}, "Rows" -> {True, True, {False}, True}},
+      GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+     
+     "Grid"]}]}], "\[RightAssociation]"}]], "Output",
+ CellChangeTimes->{{3.875468112248521*^9, 3.875468134359103*^9}, 
+   3.875469626999178*^9, {3.875470737984886*^9, 3.875470742712316*^9}},
+ CellLabel->"Out[13]=",ExpressionUUID->"bec9628f-4cee-43de-9f28-279ba4a2b0ac"]
+}, Open  ]]
+},
+WindowSize->{808, 911},
+WindowMargins->{{491, Automatic}, {Automatic, 29}},
+FrontEndVersion->"13.1 for Mac OS X x86 (64-bit) (June 21, 2022)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"9c1448e2-71f2-4c5a-b2d5-fc24936594ae"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[583, 22, 527, 10, 88, "Input",ExpressionUUID->"bce32483-9517-4efc-9d22-e55a5b6c4fad"],
+Cell[1113, 34, 231, 5, 25, "Echo",ExpressionUUID->"c0cf35f2-8e52-4fd9-8d20-0617029ff8ba"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1381, 44, 676, 14, 88, "Input",ExpressionUUID->"600e405d-ac7c-4f3f-978e-102bd949709a"],
+Cell[2060, 60, 25729, 681, 875, "Output",ExpressionUUID->"30f4eb6c-5c00-446c-8503-de209b1d4b9a"],
+Cell[27792, 743, 593, 14, 28, "Message",ExpressionUUID->"b3e3a3f1-4db3-40fc-8884-995fca782a57"],
+Cell[28388, 759, 1840, 32, 81, "Message",ExpressionUUID->"00505d64-4607-455d-b694-f988b7a9c271"],
+Cell[30231, 793, 1842, 32, 81, "Message",ExpressionUUID->"dd337f73-e066-4ed2-b72b-94a47aca3c8f"],
+Cell[32076, 827, 1761, 31, 81, "Message",ExpressionUUID->"23d3eaa3-93ee-4ba1-8f81-c74a2276e19c"],
+Cell[33840, 860, 1113, 20, 81, "Message",ExpressionUUID->"fa226aaa-197b-4594-b015-e3e73e8c9ab2"],
+Cell[34956, 882, 1745, 29, 81, "Message",ExpressionUUID->"231adb0c-2410-4a04-8ac2-76330a2d7596"],
+Cell[36704, 913, 1745, 29, 81, "Message",ExpressionUUID->"2398d953-6907-40ab-90a0-7ba71af84fbf"],
+Cell[38452, 944, 498, 11, 28, "Message",ExpressionUUID->"483c4c18-91e9-44e0-a4a2-271bfac97aa9"],
+Cell[38953, 957, 25826, 682, 875, "Output",ExpressionUUID->"bec9628f-4cee-43de-9f28-279ba4a2b0ac"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+
