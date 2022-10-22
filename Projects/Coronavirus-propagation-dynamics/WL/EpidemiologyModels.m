@@ -83,8 +83,8 @@ using the time variable var with symbols in the context con.";
 SEIRModel::usage = "SEIRModel[var, con] generates SEIR model stocks, rates, and equations \
 using the time variable var with symbols in the context con.";
 
-SEIQRModel::usage = "SEIRQModel[var, con] generates SEIQR model stocks, rates, and equations for Monkeypox evaluation \
-using the time variable var with symbols in the context con.";
+(* SEIQRModel::usage = "SEIRQModel[var, con] generates SEIQR model stocks, rates, and equations for Monkeypox evaluation \
+using the time variable var with symbols in the context con."; *)
 
 SEI2RModel::usage = "SEI2RModel[var, con] generates SEI2R model stocks, rates, and equations \
 using the time variable var with symbols in the context con.";
@@ -1691,4 +1691,3 @@ ModelGridTableForm[___] :=
 End[]; (* `Private` *)
 
 EndPackage[]
-
