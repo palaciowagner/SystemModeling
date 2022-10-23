@@ -80,7 +80,9 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
         suspectedRate = ToExpression[ context <> "\[Alpha]2"],
         notDetectedRate = ToExpression[ context <> "\[CurlyPhi]"],
         suspectedToRecoveredRate = ToExpression[ context <> "\[Tau]"],
-        recoveryRate = ToExpression[ context <> "\[Gamma]"]
+        recoveryRate = ToExpression[ context <> "\[Gamma]"],
+        avgIncubationPeriod = ToExpression[ context <> "\[Zeta]"],
+        avgInfectionPeriod = ToExpression[ context <> "\[Lambda]"]
       },
 
         (* Stocks *)
@@ -100,7 +102,9 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
               suspectedRate -> "Proportion Sent to Quarantine (Suspected)",
               notDetectedRate -> "Proportion of not detected after medical diagnosis (Discarded)",
               suspectedToRecoveredRate -> "Proportion from Suspected to Recovered class",
-              recoveryRate -> "Recovery Rate"
+              recoveryRate -> "Recovery Rate",
+              avgIncubationPeriod -> "Average Incubation Period",
+              avgInfectionPeriod -> "Average Infection Period"
             |>;
 
         newlyExposedRate := (contactRate * IP[t] * SP[t]) / NP[t];
@@ -119,11 +123,13 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
             <|
               NP[0] -> 100000,
               contactRate -> 0.00006*10^-1,
-              exposedToInfectedRate -> 0.2*10^-1,
-              suspectedRate -> 2.0*10^-1,
+              exposedToInfectedRate -> 1/avgIncubationPeriod,
+              suspectedRate -> 1/avgIncubationPeriod + 1/avgInfectionPeriod,
               notDetectedRate -> 2.0*10^-1,
-              suspectedToRecoveredRate -> 0.52*10^-1,
-              recoveryRate -> 0.83*10^-1
+              suspectedToRecoveredRate -> recoveryRate,
+              recoveryRate -> 1/avgInfectionPeriod,
+              avgIncubationPeriod -> Mean[Range[5,21]],
+              avgInfectionPeriod -> Mean[Map[Mean] @ {Range[0,3], Range[7,21]}]
             |>;
         
         If[ withVitalDynamicsQ,
@@ -157,8 +163,6 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
           tpRepr == "AlgebraicEquation",
           lsEquations = Append[lsEquations, NP[t] == Max[ 0, SP[t] + EP[t] + IP[t] + QP[t] + RP[t] ] ]
         ];
-
-       
 
         aRes = <| "Stocks" -> aStocks, "Rates" -> aRates, "Equations" -> lsEquations |>;
 
