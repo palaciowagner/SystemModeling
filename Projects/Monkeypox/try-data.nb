@@ -1,0 +1,395 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='WolframDesktop 13.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       161,          7]
+NotebookDataLength[     14165,        387]
+NotebookOptionsPosition[     13815,        373]
+NotebookOutlinePosition[     14212,        389]
+CellTagsIndexPosition[     14169,        386]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Import", "[", 
+  "\"\<https://raw.githubusercontent.com/antononcube/SystemModeling/master/\
+Projects/Coronavirus-propagation-dynamics/WL/EpidemiologyModels.m\>\"", 
+  "]"}], "\n", 
+ RowBox[{"Import", "[", 
+  "\"\<https://raw.githubusercontent.com/antononcube/SystemModeling/master/\
+Projects/Coronavirus-propagation-dynamics/WL/EpidemiologyModelModifications.m\
+\>\"", "]"}], "\n", 
+ RowBox[{"Import", "[", 
+  "\"\<https://raw.githubusercontent.com/antononcube/SystemModeling/master/WL/\
+SystemDynamicsInteractiveInterfacesFunctions.m\>\"", 
+  "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"modelSI2R", "=", 
+   RowBox[{"SEI2RModel", "[", 
+    RowBox[{"t", ",", 
+     RowBox[{"\"\<InitialConditions\>\"", "->", "True"}], ",", 
+     RowBox[{"\"\<RateRules\>\"", "->", "True"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"ModelGridTableForm", "[", "modelSI2R", "]"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"ModelGridTableForm", "[", "modelSI2R", "]"}], "[", 
+  "\"\<Equations\>\"", "]"}], "\[IndentingNewLine]", 
+ RowBox[{"pos", "=", 
+  RowBox[{"EquationPosition", "[", 
+   RowBox[{
+    RowBox[{"modelSI2R", "[", "\"\<Equations\>\"", "]"}], ",", 
+    RowBox[{"First", "@", 
+     RowBox[{"GetPopulationSymbols", "[", 
+      RowBox[{"modelSI2R", ",", "\"\<Susceptible Population\>\""}], "]"}]}]}],
+    "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{"birthTerm", "=", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"GetPopulations", "[", 
+     RowBox[{"modelSI2R", ",", "\"\<Total Population\>\""}], "]"}], 
+    "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], "*", 
+   RowBox[{
+    RowBox[{"GetRates", "[", 
+     RowBox[{"modelSI2R", ",", "\"\<Population death rate\>\""}], "]"}], 
+    "\[LeftDoubleBracket]", "1", 
+    "\[RightDoubleBracket]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"modelSI2RNew", "=", "modelSI2R"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"modelSI2RNew", "[", "\"\<Equations\>\"", "]"}], "=", 
+   RowBox[{"ReplacePart", "[", 
+    RowBox[{
+     RowBox[{"modelSI2R", "[", "\"\<Equations\>\"", "]"}], ",", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"1", ",", "2"}], "}"}], "->", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"modelSI2R", "[", "\"\<Equations\>\"", "]"}], 
+        "\[LeftDoubleBracket]", 
+        RowBox[{"1", ",", "2"}], "\[RightDoubleBracket]"}], "+", 
+       "birthTerm"}]}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"ModelGridTableForm", "[", "modelSI2RNew", "]"}], "[", 
+  "\"\<Equations\>\"", "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"AppendTo", "[", 
+   RowBox[{
+    RowBox[{"modelSI2R", "[", "\"\<Equations\>\"", "]"}], ",", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"IDP", "'"}], "[", "t", "]"}], "\[Equal]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"\[Mu]", "[", "INSP", "]"}], "*", 
+       RowBox[{"INSP", "[", "t", "]"}]}], "+", 
+      RowBox[{
+       RowBox[{"\[Mu]", "[", "ISSP", "]"}], "*", 
+       RowBox[{"ISSP", "[", "t", "]"}]}]}]}]}], "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"AppendTo", "[", 
+   RowBox[{
+    RowBox[{"modelSI2R", "[", "\"\<Stocks\>\"", "]"}], ",", 
+    RowBox[{
+     RowBox[{"IDP", "[", "t", "]"}], "->", 
+     "\"\<Infected Deceased Population\>\""}]}], "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"AppendTo", "[", 
+   RowBox[{
+    RowBox[{"modelSI2R", "[", "\"\<InitialConditions\>\"", "]"}], ",", 
+    RowBox[{
+     RowBox[{"IDP", "[", "0", "]"}], "\[Equal]", "0"}]}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"ModelGridTableForm", "[", "modelSI2R", "]"}], "[", 
+  "\"\<Equations\>\"", "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"lsFocusParams", "=", 
+   RowBox[{"{", 
+    RowBox[{"aincp", ",", "aip", ",", 
+     RowBox[{"sspf", "[", "SP", "]"}], ",", 
+     RowBox[{"\[Beta]", "[", "ISSP", "]"}], ",", 
+     RowBox[{"\[Beta]", "[", "INSP", "]"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"population", "=", 
+   RowBox[{"58160000", "/", "400"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"modelSI2R", "=", 
+   RowBox[{"SetRateRules", "[", 
+    RowBox[{"modelSI2R", ",", 
+     RowBox[{"<|", 
+      RowBox[{
+       RowBox[{"TP", "[", "0", "]"}], "->", "population"}], "|>"}]}], "]"}]}],
+   ";"}], "\n", 
+ RowBox[{
+  RowBox[{"modelSI2R", "=", 
+   RowBox[{"SetInitialConditions", "[", 
+    RowBox[{"modelSI2R", ",", 
+     RowBox[{"<|", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"SP", "[", "0", "]"}], "->", 
+        RowBox[{"population", "-", "1"}]}], ",", 
+       RowBox[{
+        RowBox[{"ISSP", "[", "0", "]"}], "->", "0"}], ",", 
+       RowBox[{
+        RowBox[{"INSP", "[", "0", "]"}], "->", "1"}]}], "|>"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"lsActualEquations", "=", 
+   RowBox[{"Join", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"modelSI2R", "[", "\"\<Equations\>\"", "]"}], "//.", 
+      RowBox[{"KeyDrop", "[", 
+       RowBox[{
+        RowBox[{"modelSI2R", "[", "\"\<RateRules\>\"", "]"}], ",", 
+        "lsFocusParams"}], "]"}]}], ",", 
+     RowBox[{"modelSI2R", "[", "\"\<InitialConditions\>\"", "]"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"ResourceFunction", "[", "\"\<GridTableForm\>\"", "]"}], "[", 
+  RowBox[{"List", "/@", "lsActualEquations"}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"aSol", "=", 
+  RowBox[{"Association", "@", 
+   RowBox[{"Flatten", "@", 
+    RowBox[{"ParametricNDSolve", "[", 
+     RowBox[{"lsActualEquations", ",", 
+      RowBox[{"Head", "/@", 
+       RowBox[{"Keys", "[", 
+        RowBox[{"modelSI2R", "[", "\"\<Stocks\>\"", "]"}], "]"}]}], ",", 
+      RowBox[{"{", 
+       RowBox[{"t", ",", "0", ",", "365"}], "}"}], ",", "lsFocusParams"}], 
+     "]"}]}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"opts", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"PlotRange", "->", "All"}], ",", 
+     RowBox[{"PlotLegends", "->", "None"}], ",", 
+     RowBox[{"PlotTheme", "->", "\"\<Detailed\>\""}], ",", 
+     RowBox[{"PerformanceGoal", "->", "\"\<Speed\>\""}], ",", 
+     RowBox[{"ImageSize", "->", "300"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"lsPopulationKeys", "=", 
+   RowBox[{"GetPopulationSymbols", "[", 
+    RowBox[{"modelSI2R", ",", 
+     RowBox[{"__", "~~", "\"\<Population\>\""}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"lsEconKeys", "=", 
+   RowBox[{"{", "MLP", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Manipulate", "[", 
+  RowBox[{
+   RowBox[{"DynamicModule", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"lsPopulationPlots", ",", "lsEconPlots", ",", "lsRestPlots"}], 
+      "}"}], ",", 
+     RowBox[{
+      RowBox[{"lsPopulationPlots", "=", 
+       RowBox[{"ParametricSolutionsPlots", "[", 
+        RowBox[{
+         RowBox[{"modelSI2R", "[", "\"\<Stocks\>\"", "]"}], ",", 
+         RowBox[{"KeyTake", "[", 
+          RowBox[{"aSol", ",", "lsPopulationKeys"}], "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{
+          "aincp", ",", "aip", ",", "spf", ",", "crisp", ",", "criap"}], 
+          "}"}], ",", "ndays", ",", 
+         RowBox[{"\"\<LogPlot\>\"", "->", "popLogPlotQ"}], ",", 
+         RowBox[{"\"\<Together\>\"", "->", "popTogetherQ"}], ",", 
+         RowBox[{"\"\<Derivatives\>\"", "->", "popDerivativesQ"}], ",", 
+         RowBox[{
+         "\"\<DerivativePrefix\>\"", "->", "\"\<\[CapitalDelta]\>\""}], ",", 
+         "opts"}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"lsEconPlots", "=", 
+       RowBox[{"ParametricSolutionsPlots", "[", 
+        RowBox[{
+         RowBox[{"modelSI2R", "[", "\"\<Stocks\>\"", "]"}], ",", 
+         RowBox[{"KeyTake", "[", 
+          RowBox[{"aSol", ",", "lsEconKeys"}], "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{
+          "aincp", ",", "aip", ",", "spf", ",", "crisp", ",", "criap"}], 
+          "}"}], ",", "ndays", ",", 
+         RowBox[{"\"\<LogPlot\>\"", "->", "econLogPlotQ"}], ",", 
+         RowBox[{"\"\<Together\>\"", "->", "econTogetherQ"}], ",", 
+         RowBox[{"\"\<Derivatives\>\"", "->", "econDerivativesQ"}], ",", 
+         RowBox[{
+         "\"\<DerivativePrefix\>\"", "->", "\"\<\[CapitalDelta]\>\""}], ",", 
+         "opts"}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"lsRestPlots", "=", 
+       RowBox[{"ParametricSolutionsPlots", "[", 
+        RowBox[{
+         RowBox[{"modelSI2R", "[", "\"\<Stocks\>\"", "]"}], ",", 
+         RowBox[{"KeyDrop", "[", 
+          RowBox[{"aSol", ",", 
+           RowBox[{"Join", "[", 
+            RowBox[{"lsPopulationKeys", ",", "lsEconKeys"}], "]"}]}], "]"}], 
+         ",", 
+         RowBox[{"{", 
+          RowBox[{
+          "aincp", ",", "aip", ",", "spf", ",", "crisp", ",", "criap"}], 
+          "}"}], ",", "ndays", ",", 
+         RowBox[{"\"\<LogPlot\>\"", "->", "econLogPlotQ"}], ",", 
+         RowBox[{"\"\<Together\>\"", "->", "econTogetherQ"}], ",", 
+         RowBox[{"\"\<Derivatives\>\"", "->", "econDerivativesQ"}], ",", 
+         RowBox[{
+         "\"\<DerivativePrefix\>\"", "->", "\"\<\[CapitalDelta]\>\""}], ",", 
+         "opts"}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"Multicolumn", "[", 
+       RowBox[{
+        RowBox[{"Join", "[", 
+         RowBox[{
+         "lsPopulationPlots", ",", "lsEconPlots", ",", "lsRestPlots"}], "]"}],
+         ",", "nPlotColumns", ",", 
+        RowBox[{"Dividers", "->", "All"}], ",", 
+        RowBox[{"FrameStyle", "->", 
+         RowBox[{"GrayLevel", "[", "0.8", "]"}]}]}], "]"}]}]}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "aincp", ",", "6.", ",", "\"\<Average incubation period (days)\>\""}], 
+      "}"}], ",", "1", ",", "60.", ",", "1", ",", 
+     RowBox[{"Appearance", "->", 
+      RowBox[{"{", "\"\<Open\>\"", "}"}]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "aip", ",", "32.", ",", "\"\<Average infectious period (days)\>\""}], 
+      "}"}], ",", "1", ",", "100.", ",", "1", ",", 
+     RowBox[{"Appearance", "->", 
+      RowBox[{"{", "\"\<Open\>\"", "}"}]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "spf", ",", "0.2", ",", 
+       "\"\<Severely symptomatic population fraction\>\""}], "}"}], ",", "0", 
+     ",", "1", ",", "0.025", ",", 
+     RowBox[{"Appearance", "->", 
+      RowBox[{"{", "\"\<Open\>\"", "}"}]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "crisp", ",", "0.56", ",", 
+       "\"\<Contact rate of the infected severely symptomatic \
+population\>\""}], "}"}], ",", "0", ",", "20", ",", "0.01", ",", 
+     RowBox[{"Appearance", "->", 
+      RowBox[{"{", "\"\<Open\>\"", "}"}]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "criap", ",", "0.56", ",", 
+       "\"\<Contact rate of the infected normally symptomatic \
+population\>\""}], "}"}], ",", "0", ",", "20", ",", "0.01", ",", 
+     RowBox[{"Appearance", "->", 
+      RowBox[{"{", "\"\<Open\>\"", "}"}]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"ndays", ",", "160", ",", "\"\<Number of days\>\""}], "}"}], 
+     ",", "1", ",", "365", ",", "1", ",", 
+     RowBox[{"Appearance", "->", 
+      RowBox[{"{", "\"\<Open\>\"", "}"}]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "popTogetherQ", ",", "True", ",", "\"\<Plot populations together\>\""}],
+       "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"False", ",", "True"}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "popDerivativesQ", ",", "False", ",", 
+       "\"\<Plot populations derivatives\>\""}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"False", ",", "True"}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "popLogPlotQ", ",", "False", ",", "\"\<LogPlot populations\>\""}], 
+      "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"False", ",", "True"}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "econTogetherQ", ",", "False", ",", 
+       "\"\<Plot economics functions together\>\""}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"False", ",", "True"}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "econDerivativesQ", ",", "False", ",", 
+       "\"\<Plot economics functions derivatives\>\""}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"False", ",", "True"}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "econLogPlotQ", ",", "False", ",", 
+       "\"\<LogPlot economics functions\>\""}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"False", ",", "True"}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "nPlotColumns", ",", "1", ",", "\"\<Number of plot columns\>\""}], 
+      "}"}], ",", 
+     RowBox[{"Range", "[", "5", "]"}]}], "}"}], ",", 
+   RowBox[{"ControlPlacement", "->", "Left"}], ",", 
+   RowBox[{"ContinuousAction", "->", "False"}]}], 
+  "]"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.875554801316168*^9, 3.875554896610539*^9}},
+ CellLabel->"In[1]:=",ExpressionUUID->"7b6f8489-b8b5-479d-b0bf-fb5ae8ce3bd3"]
+},
+WindowSize->{1440, 847},
+WindowMargins->{{-1440, Automatic}, {Automatic, 71}},
+FrontEndVersion->"13.1 for Mac OS X x86 (64-bit) (June 21, 2022)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"b082425d-5de9-4282-a176-deed0c359e37"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[561, 20, 13250, 351, 1339, "Input",ExpressionUUID->"7b6f8489-b8b5-479d-b0bf-fb5ae8ce3bd3"]
+}
+]
+*)
+
