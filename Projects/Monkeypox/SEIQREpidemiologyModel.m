@@ -123,8 +123,8 @@ SEIQRModel[t_Symbol, context_String : "Global`", opts : OptionsPattern[] ] :=
             <|
               NP[0] -> 100000,
               contactRate -> 0.00006*10^-1,
-              exposedToInfectedRate -> 1/avgIncubationPeriod,
-              suspectedRate -> 1/avgIncubationPeriod + 1/avgInfectionPeriod,
+              exposedToInfectedRate -> 1/avgIncubationPeriod + 1/avgInfectionPeriod,
+              suspectedRate -> 1/avgIncubationPeriod,
               notDetectedRate -> 2.0*10^-1,
               suspectedToRecoveredRate -> recoveryRate,
               recoveryRate -> 1/avgInfectionPeriod,
