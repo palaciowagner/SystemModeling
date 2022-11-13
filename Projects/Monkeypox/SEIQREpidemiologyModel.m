@@ -21,6 +21,8 @@ PadRealData::usage = "PadRealData[aData_, incubationPeriod_, infectionPeriod_] p
 
 toModelTime::usage = "toModelTime[date_, date_] returns the point in the graphic for the specified date";
 
+toDataDate::usage = "toDataDate[date_, number_] First argument is a Date and second an Integer/Real";
+
 fitWithDataPlot::usage = "fitWithDataPlot[fittedModel_, {firstDate_, lastDate_}] plots a graphic for the fitted model";
 
 modelSensitivityPlot::usage = "modeSensitivityPlot[aSol_, fittedModel_, {{tMax_, tMin_}, {xMax, xMin}}, {parametersValues_}] plots a Sensitivity analysis graphic of the parameters of the FittedModel"
@@ -241,9 +243,9 @@ Options[SmoothPeriod] = {
   "TimeUnit" -> "Days"
 };
 
-SmoothPeriod[data: TimeSeries: "Global`", period_?IntegerQ: "Global`",  opts : OptionsPattern[]] := 
+SmoothPeriod[data_: "Global`", period_Integer: "Global`",  opts : OptionsPattern[]] := 
     Block[{},
-      MovingMap[Ceiling[Mean[#]]&, data, {period, OptionValue[SmoothPeriod, "Align"], Quantity[period, OptionValue[SmoothPeriod, "TimeUnit"]]}];
+      MovingMap[Ceiling[Mean[#]]&, data, {period, OptionValue[SmoothPeriod, "Align"], Quantity[period, OptionValue[SmoothPeriod, "TimeUnit"]]}]
     ];
 
 
@@ -278,11 +280,7 @@ SyntaxInformation[toModelTime] = { "ArgumentsPattern" -> {_,_} };
 toModelTime::"nargs" = "Both arguments are expected to be Date Objects";
 
 (* time is measured in Days *)
-toModelTime[t0_DateObject, date_DateObject] := 
-    Block[{}, 
-        QuantityMagnitude[DateDifference[t0, date]]
-        toDataDate[t0_DateObject, time : (_Integer | _Real)] := DatePlus[t0, time]
-    ];
+toModelTime[t0_?DateObject, date_?DateObject] := QuantityMagnitude[DateDifference[t0, date]]
  	
 toModelTime[___] :=
     Block[{},
@@ -290,14 +288,22 @@ toModelTime[___] :=
       $Failed
     ];
 
+Clear[toDataDate];
+SyntaxInformation[toDataDate] = { "ArgumentsPattern" -> {_,_} };
+toDataDate::"nargs" = "First argument is a Date and second an Integer/Real";
+toDataDate[t0_?DateObject, time : (_Integer | _Real)] := DatePlus[t0, time]
+ 	
+toDataDate[___] :=
+    Block[{},
+      Message[toDataDate::"nargs"];
+      $Failed
+    ];
 
 Clear[fitWithDataPlot];
 SyntaxInformation[fitWithDataPlot] = { "ArgumentsPattern" -> { _, {_,_} } };
 fitWithDataPlot::"nargs" = "First argument is expected to be a FittedModel. Second should be a minimum and maximum date objects contained in curly brackets {}";
 
-fitWithDataPlot[fit: FittedModel, {dateMin_DateObject, dateMax_DateObject}] := 
-
-  Block[{plotData, bands, cd}, 
+fitWithDataPlot[fit_FittedModel: "Global`", {dateMin_?DateObject, dateMax_?DateObject}] := 
     Module[{plotData, bands, cd = ColorData[108]},
       plotData = {toDataDate[dateMin, #1], #2} & @@@ fit["Data"];
       bands[x_] = 
@@ -331,7 +337,6 @@ fitWithDataPlot[fit: FittedModel, {dateMin_DateObject, dateMax_DateObject}] :=
             Lighter@cd[2]]}, {"95% prediction band"}]}, 
               Left], Right] &
       ]
-  ];
 
 fitWithDataPlot[___] :=
     Block[{},
@@ -343,8 +348,7 @@ Clear[modelSensitivityPlot];
 SyntaxInformation[modelSensitivityPlot] = { "ArgumentsPattern" -> { _, _, {{_, _}, {_, _}}, _} };
 modelSensitivityPlot::"nargs" = "First argument is a ParametricFunction, Second a FittedModel, Third minimum and max numbers for t and y, and Fourth the scale in NumberQ";
 
-modelSensitivityPlot[modelIn : (_ParametricFunction[__]), fit_FittedModel, {{tMin_?NumberQ, tMax_?NumberQ}, {yMin_?NumberQ, yMax_?NumberQ}}, scale : {__?NumberQ}] := 
-    Block[{model, sensitivities, cd, params, t}, 
+modelSensitivityPlot[modelIn : (_ParametricFunction[__]), fit_?FittedModel: "Global`", {{tMin_?NumberQ, tMax_?NumberQ}, {yMin_?NumberQ, yMax_?NumberQ}}, scale : {__?NumberQ}] := 
       Module[{model, sensitivities, cd = ColorData[108], params, t}, 
         params = fit["BestFitParameters"];
         model = modelIn[t] /. params;
@@ -376,7 +380,6 @@ modelSensitivityPlot[modelIn : (_ParametricFunction[__]), fit_FittedModel, {{tMi
                   SwatchLegend[{Opacity[0.5, 
                     Lighter@cd[4]]}, {"positive sensitivity"}]}, Left], 
                 Right] &)], {Keys@params, sensitivities, scale}]]
-    ];
 
 modelSensitivityPlot[___] :=
     Block[{},
@@ -388,8 +391,7 @@ Clear[residualsPlot];
 SyntaxInformation[residualsPlot] = { "ArgumentsPattern" -> {_} };
 residualsPlot::"nargs" = "First argument expected to be a FittedModel";
 
-residualsPlot[fit_FittedModel] := 
-    Block[{width}, 
+residualsPlot[fit_?FittedModel: "Global`"] := 
       Module[{width = 4 72}, 
         GraphicsGrid[{{ListPlot[
             Thread[{First /@ fit["Data"], fit["FitResiduals"]}], 
@@ -399,7 +401,6 @@ residualsPlot[fit_FittedModel] :=
             FrameLabel -> {"PredictedResponse", "FitResiduals"}, 
             Filling -> Axis, ImageSize -> width]}}, 
         Spacings -> Scaled[0.05]]]
-    ];
 
 residualsPlot[___] :=
     Block[{},
