@@ -217,7 +217,10 @@ Clear[Smooth];
 SyntaxInformation[Smooth] = { "ArgumentsPattern" -> {_} };
 Smooth::"nargs" = "The first argument is expected to be a TimeSeries symbol.";
 
-Smooth[data_Symbol] := MovingMap[Ceiling[Mean[#]] &, data, {{7, "Day"}, Left, "Week"}, Automatic];
+Smooth[data_Symbol] := 
+    Block[{},
+      MovingMap[Ceiling[Mean[#]] &, data, {{7, "Day"}, Left, "Week"}, Automatic]
+    ];
 
 Smooth[___] :=
     Block[{},
@@ -239,7 +242,10 @@ Options[SmoothPeriod] = {
 };
 
 SmoothPeriod[data_Symbol, period_?IntegerQ,  opts : OptionsPattern[]] := 
-MovingMap[Ceiling[Mean[#]]&, data, {period, OptionValue[SmoothPeriod, "Align"], Quantity[period, OptionValue[SmoothPeriod, "TimeUnit"]]}];
+    Block[{},
+      MovingMap[Ceiling[Mean[#]]&, data, {period, OptionValue[SmoothPeriod, "Align"], Quantity[period, OptionValue[SmoothPeriod, "TimeUnit"]]}];
+    ];
+
 
 SmoothPeriod[___] :=
     Block[{},
@@ -251,7 +257,7 @@ SmoothPeriod[___] :=
 Thank you!
 *)
 
-ClearAll[PadRealData];
+Clear[PadRealData];
 SyntaxInformation[PadRealData] = { "ArgumentsPattern" -> {_,_,_} };
 PadRealData::"nargs" = "The first argument is expected to be an association, second and third Integers representing Incubation Period and Infectious Period";
 
@@ -270,11 +276,14 @@ PadRealData[___] :=
 Clear[toModelTime];
 SyntaxInformation[toModelTime] = { "ArgumentsPattern" -> {_,_} };
 toModelTime::"nargs" = "Both arguments are expected to be Date Objects";
+
 (* time is measured in Days *)
 toModelTime[t0_DateObject, date_DateObject] := 
- 	QuantityMagnitude[DateDifference[t0, date]]
-toDataDate[t0_DateObject, time : (_Integer | _Real)] := DatePlus[t0, time]
-
+    Block[{}, 
+        QuantityMagnitude[DateDifference[t0, date]]
+        toDataDate[t0_DateObject, time : (_Integer | _Real)] := DatePlus[t0, time]
+    ];
+ 	
 toModelTime[___] :=
     Block[{},
       Message[toModelTime::"nargs"];
@@ -283,44 +292,47 @@ toModelTime[___] :=
 
 
 Clear[fitWithDataPlot];
-SyntaxInformation[fitWithDataPlot] = { "ArgumentsPattern" -> { _, {_, _} } };
+SyntaxInformation[fitWithDataPlot] = { "ArgumentsPattern" -> { _, {_,_} } };
 fitWithDataPlot::"nargs" = "First argument is expected to be a FittedModel. Second should be a minimum and maximum date objects contained in curly brackets {}";
 
 fitWithDataPlot[
   fit_FittedModel, {dateMin_DateObject, dateMax_DateObject}] := 
-  Module[{plotData, bands, cd = ColorData[108]},
-    plotData = {toDataDate[dateMin, #1], #2} & @@@ fit["Data"];
-    bands[x_] = 
-      Quiet[
-    fit["SinglePredictionBands", ConfidenceLevel -> 0.95] /. t -> x];
-    Show[
-        DateListPlot[plotData,
-          Joined -> False,
-          PlotRange -> All
-          ],
-        Plot[{fit[toModelTime[dateMin, FromAbsoluteTime@t]], 
-            bands[toModelTime[dateMin, FromAbsoluteTime@t]]}, {t, 
-            AbsoluteTime@dateMin, AbsoluteTime@dateMax},
+
+  Block[{plotData, bands, cd}, 
+    Module[{plotData, bands, cd = ColorData[108]},
+      plotData = {toDataDate[dateMin, #1], #2} & @@@ fit["Data"];
+      bands[x_] = 
+        Quiet[
+      fit["SinglePredictionBands", ConfidenceLevel -> 0.95] /. t -> x];
+      Show[
+          DateListPlot[plotData,
+            Joined -> False,
+            PlotRange -> All
+            ],
+          Plot[{fit[toModelTime[dateMin, FromAbsoluteTime@t]], 
+              bands[toModelTime[dateMin, FromAbsoluteTime@t]]}, {t, 
+              AbsoluteTime@dateMin, AbsoluteTime@dateMax},
+            PlotRange -> All,
+            PlotStyle -> {cd[2], None},
+            Filling -> {2 -> {1}},
+            FillingStyle -> {Opacity[0.5, Lighter@cd[2]]}
+            ],
           PlotRange -> All,
-          PlotStyle -> {cd[2], None},
-          Filling -> {2 -> {1}},
-          FillingStyle -> {Opacity[0.5, Lighter@cd[2]]}
-          ],
-        PlotRange -> All,
-        PlotRangePadding -> {Automatic, {Scaled[0.03], Scaled[0.1]}},
-        FrameLabel -> {"time (d)", "number infected"},
-        PlotLabel -> 
-          
-     StringForm["Estimated variance = ``", fit["EstimatedVariance"]],
-        ImageSize -> 360
-        ] // Labeled[#, 
-          Column[{PointLegend[{cd[1]}, {"observed"}], 
-              LineLegend[{cd[2]}, {"calculated"}], 
-              
-       SwatchLegend[{Opacity[0.5, 
-          Lighter@cd[2]]}, {"95% prediction band"}]}, 
-            Left], Right] &
-    ]
+          PlotRangePadding -> {Automatic, {Scaled[0.03], Scaled[0.1]}},
+          FrameLabel -> {"time (d)", "number infected"},
+          PlotLabel -> 
+            
+      StringForm["Estimated variance = ``", fit["EstimatedVariance"]],
+          ImageSize -> 360
+          ] // Labeled[#, 
+            Column[{PointLegend[{cd[1]}, {"observed"}], 
+                LineLegend[{cd[2]}, {"calculated"}], 
+                
+        SwatchLegend[{Opacity[0.5, 
+            Lighter@cd[2]]}, {"95% prediction band"}]}, 
+              Left], Right] &
+      ]
+  ];
 
 fitWithDataPlot[___] :=
     Block[{},
@@ -335,37 +347,40 @@ modelSensitivityPlot::"nargs" = "First argument is a ParametricFunction, Second 
 modelSensitivityPlot[modelIn : (_ParametricFunction[__]), 
   fit_FittedModel, {{tMin_?NumberQ, tMax_?NumberQ}, {yMin_?NumberQ, 
     yMax_?NumberQ}}, scale : {__?NumberQ}] := 
- Module[{model, sensitivities, cd = ColorData[108], params, t}, 
-  params = fit["BestFitParameters"];
-  model = modelIn[t] /. params;
-  sensitivities = 
-   MapThread[
-    model + (#2 {-1, 1} D[modelIn, #1][t] /. params) &, {Keys@params, 
-     scale}];
-  TabView@
-   MapThread[
-    Function[{p, bands, sf}, 
-     p -> (Show[ListPlot[fit["Data"], PlotRange -> All], 
-         Plot[{model, bands} // Evaluate, {t, tMin, tMax}, 
-          PlotRange -> All, 
-          PlotStyle -> {cd[2], Lighter@cd[3], Lighter@cd[4]}, 
-          Filling -> {2 -> {{1}, Opacity[0.5, Lighter@cd[3]]}, 
-            3 -> {{1}, Opacity[0.5, Lighter@cd[4]]}}], 
-         PlotRange -> {All, {yMin, yMax}}, 
-         PlotRangePadding -> {Automatic, {Scaled[0.03], Scaled[0.1]}},
-          FrameLabel -> {"time (d)", "number infected"}, 
-         PlotLabel -> "Parameter sensitivity", 
-         Epilog -> {Inset[
-            StringForm["scale factor = ``", TraditionalForm[sf]], 
-            Scaled[{0.05, 0.95}], {-1, 1}]}] // 
-        Labeled[#, 
-          Column[{PointLegend[{cd[1]}, {"observed"}], 
-            LineLegend[{cd[2]}, {"calculated"}], 
-            SwatchLegend[{Opacity[0.5, 
-               Lighter@cd[3]]}, {"negative sensitivity"}], 
-            SwatchLegend[{Opacity[0.5, 
-               Lighter@cd[4]]}, {"positive sensitivity"}]}, Left], 
-          Right] &)], {Keys@params, sensitivities, scale}]]
+
+    Block[{model, sensitivities, cd, params, t}, 
+      Module[{model, sensitivities, cd = ColorData[108], params, t}, 
+        params = fit["BestFitParameters"];
+        model = modelIn[t] /. params;
+        sensitivities = 
+        MapThread[
+          model + (#2 {-1, 1} D[modelIn, #1][t] /. params) &, {Keys@params, 
+          scale}];
+        TabView@
+        MapThread[
+          Function[{p, bands, sf}, 
+          p -> (Show[ListPlot[fit["Data"], PlotRange -> All], 
+              Plot[{model, bands} // Evaluate, {t, tMin, tMax}, 
+                PlotRange -> All, 
+                PlotStyle -> {cd[2], Lighter@cd[3], Lighter@cd[4]}, 
+                Filling -> {2 -> {{1}, Opacity[0.5, Lighter@cd[3]]}, 
+                  3 -> {{1}, Opacity[0.5, Lighter@cd[4]]}}], 
+              PlotRange -> {All, {yMin, yMax}}, 
+              PlotRangePadding -> {Automatic, {Scaled[0.03], Scaled[0.1]}},
+                FrameLabel -> {"time (d)", "number infected"}, 
+              PlotLabel -> "Parameter sensitivity", 
+              Epilog -> {Inset[
+                  StringForm["scale factor = ``", TraditionalForm[sf]], 
+                  Scaled[{0.05, 0.95}], {-1, 1}]}] // 
+              Labeled[#, 
+                Column[{PointLegend[{cd[1]}, {"observed"}], 
+                  LineLegend[{cd[2]}, {"calculated"}], 
+                  SwatchLegend[{Opacity[0.5, 
+                    Lighter@cd[3]]}, {"negative sensitivity"}], 
+                  SwatchLegend[{Opacity[0.5, 
+                    Lighter@cd[4]]}, {"positive sensitivity"}]}, Left], 
+                Right] &)], {Keys@params, sensitivities, scale}]]
+    ];
 
 modelSensitivityPlot[___] :=
     Block[{},
@@ -374,19 +389,21 @@ modelSensitivityPlot[___] :=
     ];
 
 Clear[residualsPlot];
-SyntaxInformation[residualsPlot] = { "ArgumentsPattern" -> { _} };
+SyntaxInformation[residualsPlot] = { "ArgumentsPattern" -> {_} };
 residualsPlot::"nargs" = "First argument expected to be a FittedModel";
 
 residualsPlot[fit_FittedModel] := 
- Module[{width = 4 72}, 
-  GraphicsGrid[{{ListPlot[
-      Thread[{First /@ fit["Data"], fit["FitResiduals"]}], 
-      FrameLabel -> {"time (d)", "FitResiduals"}, Filling -> Axis, 
-      ImageSize -> width], 
-     ListPlot[Thread[{fit["PredictedResponse"], fit["FitResiduals"]}],
-       FrameLabel -> {"PredictedResponse", "FitResiduals"}, 
-      Filling -> Axis, ImageSize -> width]}}, 
-   Spacings -> Scaled[0.05]]]
+    Block[{width}, 
+      Module[{width = 4 72}, 
+        GraphicsGrid[{{ListPlot[
+            Thread[{First /@ fit["Data"], fit["FitResiduals"]}], 
+            FrameLabel -> {"time (d)", "FitResiduals"}, Filling -> Axis, 
+            ImageSize -> width], 
+          ListPlot[Thread[{fit["PredictedResponse"], fit["FitResiduals"]}],
+            FrameLabel -> {"PredictedResponse", "FitResiduals"}, 
+            Filling -> Axis, ImageSize -> width]}}, 
+        Spacings -> Scaled[0.05]]]
+    ];
 
 residualsPlot[___] :=
     Block[{},
