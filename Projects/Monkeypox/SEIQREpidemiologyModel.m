@@ -230,7 +230,7 @@ Smooth[___] :=
 
 Clear[SmoothPeriod];
 SyntaxInformation[SmoothPeriod] = { "ArgumentsPattern" -> {_,_, OptionsPattern[] } };
-SmoothPeriod::"nargs" = "The first argument is expected to be a TimeSeries symbol. The second argument a period in Integer)";
+SmoothPeriod::"nargs" = "The first argument is expected to be a TimeSeries symbol. The second argument a period in Integer";
 
 SmoothPeriod::"ntpval" = "The value of the option \"Align\" is expected to be one of \
 \"Right\"(Default), \"Center\" or \"Left\". \
@@ -241,7 +241,7 @@ Options[SmoothPeriod] = {
   "TimeUnit" -> "Days"
 };
 
-SmoothPeriod[data_Symbol, period_?IntegerQ,  opts : OptionsPattern[]] := 
+SmoothPeriod[data: TimeSeries: "Global`", period_?IntegerQ: "Global`",  opts : OptionsPattern[]] := 
     Block[{},
       MovingMap[Ceiling[Mean[#]]&, data, {period, OptionValue[SmoothPeriod, "Align"], Quantity[period, OptionValue[SmoothPeriod, "TimeUnit"]]}];
     ];
@@ -295,8 +295,7 @@ Clear[fitWithDataPlot];
 SyntaxInformation[fitWithDataPlot] = { "ArgumentsPattern" -> { _, {_,_} } };
 fitWithDataPlot::"nargs" = "First argument is expected to be a FittedModel. Second should be a minimum and maximum date objects contained in curly brackets {}";
 
-fitWithDataPlot[
-  fit_FittedModel, {dateMin_DateObject, dateMax_DateObject}] := 
+fitWithDataPlot[fit: FittedModel, {dateMin_DateObject, dateMax_DateObject}] := 
 
   Block[{plotData, bands, cd}, 
     Module[{plotData, bands, cd = ColorData[108]},
@@ -344,10 +343,7 @@ Clear[modelSensitivityPlot];
 SyntaxInformation[modelSensitivityPlot] = { "ArgumentsPattern" -> { _, _, {{_, _}, {_, _}}, _} };
 modelSensitivityPlot::"nargs" = "First argument is a ParametricFunction, Second a FittedModel, Third minimum and max numbers for t and y, and Fourth the scale in NumberQ";
 
-modelSensitivityPlot[modelIn : (_ParametricFunction[__]), 
-  fit_FittedModel, {{tMin_?NumberQ, tMax_?NumberQ}, {yMin_?NumberQ, 
-    yMax_?NumberQ}}, scale : {__?NumberQ}] := 
-
+modelSensitivityPlot[modelIn : (_ParametricFunction[__]), fit_FittedModel, {{tMin_?NumberQ, tMax_?NumberQ}, {yMin_?NumberQ, yMax_?NumberQ}}, scale : {__?NumberQ}] := 
     Block[{model, sensitivities, cd, params, t}, 
       Module[{model, sensitivities, cd = ColorData[108], params, t}, 
         params = fit["BestFitParameters"];
@@ -412,8 +408,6 @@ residualsPlot[___] :=
     ];
 
 End[]; (* `Private` *)
-
-
 
 EndPackage[]
 
