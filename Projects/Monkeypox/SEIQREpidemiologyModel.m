@@ -212,7 +212,7 @@ SEIQRModel[___] :=
       Message[SEIQRModel::"nargs"];
       $Failed
     ];
-
+(* 
 Clear[Smooth];
 SyntaxInformation[Smooth] = { "ArgumentsPattern" -> {_} };
 Smooth::"nargs" = "The first argument is expected to be a TimeSeries symbol.";
@@ -226,7 +226,7 @@ Smooth[___] :=
     Block[{},
       Message[Smooth::"nargs"];
       $Failed
-    ];
+    ]; *)
 
 Clear[SmoothPeriod];
 SyntaxInformation[SmoothPeriod] = { "ArgumentsPattern" -> {_,_, OptionsPattern[] } };
