@@ -13,6 +13,20 @@ BeginPackage["SEIQREpidemiologyModel`"];
 SEIQRModel::usage = "SEIRQModel[var, con] generates SEIQR model stocks, rates, and equations for Monkeypox evaluation \
 using the time variable var with symbols in the context con.";
 
+Smooth::usage = "Smooth[aTimeSeries_] smooths timeseries data into 7 days chunks";
+
+SmoothPeriod::usage = "SmoothPeriod[aTimeSeries_, period_] fits irregular data into regular one depending provided configuration";
+
+PadRealData::usage = "PadRealData[aData_, incubationPeriod_, infectionPeriod_] pads the data with the specified amounts.";
+
+toModelTime::usage = "toModelTime[date_, date_] returns the point in the graphic for the specified date";
+
+fitWithDataPlot::usage = "fitWithDataPlot[fittedModel_, {firstDate_, lastDate_}] plots a graphic for the fitted model";
+
+modelSensitivityPlot::usage = "modeSensitivityPlot[aSol_, fittedModel_, {{tMax_, tMin_}, {xMax, xMin}}, {parametersValues_}] plots a Sensitivity analysis graphic of the parameters of the FittedModel"
+
+residualsPlot::usage = "residualsPlot[FittedModel_] plots a graphic of the residuals of the Fittel Model";
+
 Begin["`Private`"];
 
 Needs["EpidemiologyModels`"];
@@ -199,7 +213,189 @@ SEIQRModel[___] :=
       $Failed
     ];
 
+Clear[Smooth];
+SyntaxInformation[Smooth] = { "ArgumentsPattern" -> { _, OptionsPattern[] } };
+Smooth::"nargs" = "The first argument is expected to be a TimeSeries symbol.";
+
+Smooth[data_TimeSeries] := MovingMap[Ceiling[Mean[#]] &, data, {{7, "Day"}, Left, "Week"}, Automatic];
+
+Smooth[___] :=
+    Block[{},
+      Message[Smooth::"nargs"];
+      $Failed
+    ];
+
+Clear[SmoothPeriod];
+SyntaxInformation[SmoothPeriod] = { "ArgumentsPattern" -> { _, _., OptionsPattern[] } };
+SmoothPeriod::"nargs" = "The first argument is expected to be a TimeSeries symbol. The second argument a period in Integer)";
+
+SmoothPeriod::"ntpval" = "The value of the option \"Align\" is expected to be one of \
+\"Right\"(Default), \"Center\" or \"Left\". \
+\"TimeUnit\" is expected to be one of a string of QuantityUnit. Default is \"Days\".";
+
+Options[SmoothPeriod] = {
+  "Align" -> Right,
+  "TimeUnit" -> "Days"
+};
+
+SmoothPeriod[data_TimeSeries, period_, ] := MovingMap[Ceiling[Mean[#]] &, data, {period, OptionValue[SmoothPeriod, "Align"], Quantity[period, OptionValue[SmoothPeriod, "TimeUnit"]]}];
+
+SmoothPeriod[___] :=
+    Block[{},
+      Message[SmoothPeriod::"nargs"];
+      $Failed
+    ];
+
+(* All below from: https://www.wolframcloud.com/obj/rnachbar/Published/EpidemiologicalModelsForInfluenzaAndCOVID-19--part_1.nb
+Thank you!
+*)
+
+ClearAll[PadRealData];
+SyntaxInformation[PadRealData] = { "ArgumentsPattern" -> { _, _, _., OptionsPattern[] } };
+PadRealData::"nargs" = "The first argument is expected to be an association, second and third Integers representing Incubation Period and Infectious Period";
+
+PadRealData[aData : Association[ (_String -> _?VectorQ) ..], incubationPeriod_?IntegerQ, infectiousPeriod_?IntegerQ] :=
+  Block[{},
+   Join[ConstantArray[0, incubationPeriod + infectiousPeriod], #] & /@
+     aData];
+
+PadRealData[___] :=
+    Block[{},
+      Message[PadRealData::"nargs"];
+      $Failed
+    ];
+
+
+Clear[toModelTime];
+SyntaxInformation[toModelTime] = { "ArgumentsPattern" -> { _, _., OptionsPattern[] } };
+toModelTime::"nargs" = "Both arguments are expected to be Date Objects";
+(* time is measured in Days *)
+toModelTime[t0_DateObject, date_DateObject] := 
+ 	QuantityMagnitude[DateDifference[t0, date]]
+toDataDate[t0_DateObject, time : (_Integer | _Real)] := DatePlus[t0, time]
+
+toModelTime[___] :=
+    Block[{},
+      Message[toModelTime::"nargs"];
+      $Failed
+    ];
+
+
+Clear[fitWithDataPlot];
+SyntaxInformation[fitWithDataPlot] = { "ArgumentsPattern" -> { _, {_, _}, OptionsPattern[] } };
+fitWithDataPlot::"nargs" = "First argument is expected to be a FittedModel. Second should be a minimum and maximum date objects contained in curly brackets {}";
+
+fitWithDataPlot[
+  fit_FittedModel, {dateMin_DateObject, dateMax_DateObject}] := 
+  Module[{plotData, bands, cd = ColorData[108]},
+    plotData = {toDataDate[dateMin, #1], #2} & @@@ fit["Data"];
+    bands[x_] = 
+      Quiet[
+    fit["SinglePredictionBands", ConfidenceLevel -> 0.95] /. t -> x];
+    Show[
+        DateListPlot[plotData,
+          Joined -> False,
+          PlotRange -> All
+          ],
+        Plot[{fit[toModelTime[dateMin, FromAbsoluteTime@t]], 
+            bands[toModelTime[dateMin, FromAbsoluteTime@t]]}, {t, 
+            AbsoluteTime@dateMin, AbsoluteTime@dateMax},
+          PlotRange -> All,
+          PlotStyle -> {cd[2], None},
+          Filling -> {2 -> {1}},
+          FillingStyle -> {Opacity[0.5, Lighter@cd[2]]}
+          ],
+        PlotRange -> All,
+        PlotRangePadding -> {Automatic, {Scaled[0.03], Scaled[0.1]}},
+        FrameLabel -> {"time (d)", "number infected"},
+        PlotLabel -> 
+          
+     StringForm["Estimated variance = ``", fit["EstimatedVariance"]],
+        ImageSize -> 360
+        ] // Labeled[#, 
+          Column[{PointLegend[{cd[1]}, {"observed"}], 
+              LineLegend[{cd[2]}, {"calculated"}], 
+              
+       SwatchLegend[{Opacity[0.5, 
+          Lighter@cd[2]]}, {"95% prediction band"}]}, 
+            Left], Right] &
+    ]
+
+fitWithDataPlot[___] :=
+    Block[{},
+      Message[fitWithDataPlot::"nargs"];
+      $Failed
+    ];
+
+Clear[modelSensitivityPlot];
+SyntaxInformation[modelSensitivityPlot] = { "ArgumentsPattern" -> { _, _, {{_, _}, {_, _}}, _., OptionsPattern[] } };
+modelSensitivityPlot::"nargs" = "First argument is a ParametricFunction, Second a FittedModel, Third minimum and max numbers for t and y, and Fourth the scale in NumberQ";
+
+modelSensitivityPlot[modelIn : (_ParametricFunction[__]), 
+  fit_FittedModel, {{tMin_?NumberQ, tMax_?NumberQ}, {yMin_?NumberQ, 
+    yMax_?NumberQ}}, scale : {__?NumberQ}] := 
+ Module[{model, sensitivities, cd = ColorData[108], params, t}, 
+  params = fit["BestFitParameters"];
+  model = modelIn[t] /. params;
+  sensitivities = 
+   MapThread[
+    model + (#2 {-1, 1} D[modelIn, #1][t] /. params) &, {Keys@params, 
+     scale}];
+  TabView@
+   MapThread[
+    Function[{p, bands, sf}, 
+     p -> (Show[ListPlot[fit["Data"], PlotRange -> All], 
+         Plot[{model, bands} // Evaluate, {t, tMin, tMax}, 
+          PlotRange -> All, 
+          PlotStyle -> {cd[2], Lighter@cd[3], Lighter@cd[4]}, 
+          Filling -> {2 -> {{1}, Opacity[0.5, Lighter@cd[3]]}, 
+            3 -> {{1}, Opacity[0.5, Lighter@cd[4]]}}], 
+         PlotRange -> {All, {yMin, yMax}}, 
+         PlotRangePadding -> {Automatic, {Scaled[0.03], Scaled[0.1]}},
+          FrameLabel -> {"time (d)", "number infected"}, 
+         PlotLabel -> "Parameter sensitivity", 
+         Epilog -> {Inset[
+            StringForm["scale factor = ``", TraditionalForm[sf]], 
+            Scaled[{0.05, 0.95}], {-1, 1}]}] // 
+        Labeled[#, 
+          Column[{PointLegend[{cd[1]}, {"observed"}], 
+            LineLegend[{cd[2]}, {"calculated"}], 
+            SwatchLegend[{Opacity[0.5, 
+               Lighter@cd[3]]}, {"negative sensitivity"}], 
+            SwatchLegend[{Opacity[0.5, 
+               Lighter@cd[4]]}, {"positive sensitivity"}]}, Left], 
+          Right] &)], {Keys@params, sensitivities, scale}]]
+
+modelSensitivityPlot[___] :=
+    Block[{},
+      Message[modelSensitivityPlot::"nargs"];
+      $Failed
+    ];
+
+Clear[residualsPlot];
+SyntaxInformation[residualsPlot] = { "ArgumentsPattern" -> { _., OptionsPattern[] } };
+residualsPlot::"nargs" = "First argument expected to be a FittedModel";
+
+residualsPlot[fit_FittedModel] := 
+ Module[{width = 4 72}, 
+  GraphicsGrid[{{ListPlot[
+      Thread[{First /@ fit["Data"], fit["FitResiduals"]}], 
+      FrameLabel -> {"time (d)", "FitResiduals"}, Filling -> Axis, 
+      ImageSize -> width], 
+     ListPlot[Thread[{fit["PredictedResponse"], fit["FitResiduals"]}],
+       FrameLabel -> {"PredictedResponse", "FitResiduals"}, 
+      Filling -> Axis, ImageSize -> width]}}, 
+   Spacings -> Scaled[0.05]]]
+
+residualsPlot[___] :=
+    Block[{},
+      Message[residualsPlot::"nargs"];
+      $Failed
+    ];
+
 End[]; (* `Private` *)
+
+
 
 EndPackage[]
 
