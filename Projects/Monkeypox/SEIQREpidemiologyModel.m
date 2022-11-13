@@ -214,7 +214,7 @@ SEIQRModel[___] :=
     ];
 
 Clear[Smooth];
-SyntaxInformation[Smooth] = { "ArgumentsPattern" -> { _, OptionsPattern[] } };
+SyntaxInformation[Smooth] = { "ArgumentsPattern" -> { _ } };
 Smooth::"nargs" = "The first argument is expected to be a TimeSeries symbol.";
 
 Smooth[data_TimeSeries] := MovingMap[Ceiling[Mean[#]] &, data, {{7, "Day"}, Left, "Week"}, Automatic];
@@ -238,7 +238,8 @@ Options[SmoothPeriod] = {
   "TimeUnit" -> "Days"
 };
 
-SmoothPeriod[data_TimeSeries, period_, ] := MovingMap[Ceiling[Mean[#]] &, data, {period, OptionValue[SmoothPeriod, "Align"], Quantity[period, OptionValue[SmoothPeriod, "TimeUnit"]]}];
+SmoothPeriod[data_TimeSeries, period_] := 
+MovingMap[Ceiling[Mean[#]]&, data, {period, OptionValue[SmoothPeriod, "Align"], Quantity[period, OptionValue[SmoothPeriod, "TimeUnit"]]}];
 
 SmoothPeriod[___] :=
     Block[{},
@@ -251,7 +252,7 @@ Thank you!
 *)
 
 ClearAll[PadRealData];
-SyntaxInformation[PadRealData] = { "ArgumentsPattern" -> { _, _, _., OptionsPattern[] } };
+SyntaxInformation[PadRealData] = { "ArgumentsPattern" -> { _, _, _. } };
 PadRealData::"nargs" = "The first argument is expected to be an association, second and third Integers representing Incubation Period and Infectious Period";
 
 PadRealData[aData : Association[ (_String -> _?VectorQ) ..], incubationPeriod_?IntegerQ, infectiousPeriod_?IntegerQ] :=
@@ -267,7 +268,7 @@ PadRealData[___] :=
 
 
 Clear[toModelTime];
-SyntaxInformation[toModelTime] = { "ArgumentsPattern" -> { _, _., OptionsPattern[] } };
+SyntaxInformation[toModelTime] = { "ArgumentsPattern" -> { _, _.} };
 toModelTime::"nargs" = "Both arguments are expected to be Date Objects";
 (* time is measured in Days *)
 toModelTime[t0_DateObject, date_DateObject] := 
@@ -282,7 +283,7 @@ toModelTime[___] :=
 
 
 Clear[fitWithDataPlot];
-SyntaxInformation[fitWithDataPlot] = { "ArgumentsPattern" -> { _, {_, _}, OptionsPattern[] } };
+SyntaxInformation[fitWithDataPlot] = { "ArgumentsPattern" -> { _, {_, _} } };
 fitWithDataPlot::"nargs" = "First argument is expected to be a FittedModel. Second should be a minimum and maximum date objects contained in curly brackets {}";
 
 fitWithDataPlot[
@@ -328,7 +329,7 @@ fitWithDataPlot[___] :=
     ];
 
 Clear[modelSensitivityPlot];
-SyntaxInformation[modelSensitivityPlot] = { "ArgumentsPattern" -> { _, _, {{_, _}, {_, _}}, _., OptionsPattern[] } };
+SyntaxInformation[modelSensitivityPlot] = { "ArgumentsPattern" -> { _, _, {{_, _}, {_, _}}, _. } };
 modelSensitivityPlot::"nargs" = "First argument is a ParametricFunction, Second a FittedModel, Third minimum and max numbers for t and y, and Fourth the scale in NumberQ";
 
 modelSensitivityPlot[modelIn : (_ParametricFunction[__]), 
@@ -373,7 +374,7 @@ modelSensitivityPlot[___] :=
     ];
 
 Clear[residualsPlot];
-SyntaxInformation[residualsPlot] = { "ArgumentsPattern" -> { _., OptionsPattern[] } };
+SyntaxInformation[residualsPlot] = { "ArgumentsPattern" -> { _.} };
 residualsPlot::"nargs" = "First argument expected to be a FittedModel";
 
 residualsPlot[fit_FittedModel] := 
