@@ -7,7 +7,9 @@ If[Length[DownValues[EpidemiologyModels`ModelGridTableForm]] == 0,
 
 
 (**************************************************************)
+
 (* Package definition                                         *)
+
 (**************************************************************)
 
 BeginPackage["SEIQREpidemiologyModel`"];
@@ -29,12 +31,59 @@ ModelSensitivityPlot::usage = "modeSensitivityPlot[aSol_, fittedModel_, {{tMax_,
 
 ResidualsPlot::usage = "residualsPlot[FittedModel_] plots a graphic of the residuals of the Fittel Model";
 
+SumSquaredError::usage = "sumSquaredError[data, model, parameters] gives the sum of squared errors for the model with the given parameters for the given data. The data and model can be lists of the same length.";
+
+closeCellGroup::usage ="";
+labeledGrid::usage ="";
+tfn::usage ="";
+
+(* SetDirectory@NotebookDirectory[]; *)
+
 Begin["`Private`"];
 
 Needs["EpidemiologyModels`"];
 
+ClearAll[closeCellGroup];
+closeCellGroup[] := (SelectionMove[EvaluationCell[], Next,Cell]; 
+FrontEndExecute[FrontEndToken["SelectionCloseUnselectedCells"]]) 
+(* 
+$PlotTheme = "Scientific";ColorData[108]  *)
+
+(* Scan[SetOptions[#1, {Axes -> False, Frame -> True, 
+     PlotRange -> All}] &, {Plot, LogPlot, LogLinearPlot, LogLogPlot, 
+   ListPlot, ListLogPlot, ListLogLinearPlot, ListLogLogPlot, ListLinePlot, 
+   ListStepPlot, DateListPlot, DateListStepPlot, DateListLogPlot, Histogram, 
+   DateHistogram}
+  ]; 
+  
+ Scan[SetOptions[#1, {PlotMarkers->{
+   Graphics[{ColorData[108][1], Disk[]}, ImageSize -> 7],
+   Graphics[{ColorData[108][2], Rectangle[]}, ImageSize -> 8],
+   Graphics[{ColorData[108][3], Rotate[Rectangle[], Pi/4]}, ImageSize -> 9],
+   Graphics[{ColorData[108][4],Triangle[{{0, 0}, {1, 0}, {1/2, Sqrt[3]/2}}]}, ImageSize -> 9],
+   Graphics[{ColorData[108][5],Triangle[{{0,  Sqrt[3]/2}, {1,  Sqrt[3]/2}, {1/2,0}}]}, ImageSize -> 9]
+   }}] &, {ListPlot, ListLogPlot, ListLogLinearPlot, ListLogLogPlot, DateListPlot, 
+   DateListLogPlot}
+  ]; 
+
+ClearAll[labeledGrid];
+labeledGrid[grid_, columnLabels_, rowLabels_, opts:OptionsPattern[]] := 
+	Grid[MapThread[Prepend, {Prepend[grid, columnLabels], Prepend[rowLabels, ""]}], 
+  opts,
+  Dividers -> {{False, True, False}, {False, True, False}}, 
+  Alignment -> {{{Center}}, {{Top}}}
+  ] 
+  
+ClearAll[tfn];
+tfn[data_] := TableForm[data, TableDepth -> 2, TableHeadings -> Automatic]
+tfc[data_] := TableForm[Rest[data], TableDepth -> 2, TableHeadings -> {None, First[data]}]  *)
+
+
+
 (**************************************************************)
-(* SEIQRModel                                              *)
+
+(* SEIQRModel                                                 *)
+
 (**************************************************************)
 
 (*
@@ -57,13 +106,11 @@ The second optional argument is expected to be context string.";
 SEIQRModel::"ntpval" = "The value of the option \"TotalPopulationRepresentation\" is expected to be one of \
 Automatic, \"Constant\", \"SumSubstitution\", \"AlgebraicEquation\"";
 
-Options[SEIQRModel] = {
-	"TotalPopulationRepresentation" -> None, 
-	"InitialConditions" -> True, 
-	"RateRules" -> True, 
-	"WithVitalDynamics" -> False };
+Options[SEIQRModel] = {"TotalPopulationRepresentation" -> None, "InitialConditions"
+	 -> True, "RateRules" -> True, "WithVitalDynamics" -> False};
 
-SEIQRModel[t_Symbol, context_String:"Global`", opts : OptionsPattern[] ] :=
+SEIQRModel[t_Symbol, context_String:"Global`", opts : OptionsPattern[
+	]] :=
 	Block[{addRateRulesQ, addInitialConditionsQ, withVitalDynamicsQ, tpRepr,
 		 aStocks, aRates, newlyExposedRate, totalPopulationGrowth, lsEquations,
 		 aRes, aRateRules, aInitialConditions},
@@ -183,20 +230,6 @@ SEIQRModel[___] :=
 	];
 
 
-
-
-ClearAll[Smooth];
-SyntaxInformation[Smooth] = {"ArgumentsPattern" -> {_}};
-Smooth::"nargs" = "The first argument is expected to be a TimeSeries symbol.";
-
-Smooth[data_TimeSeries: "Global`"] := MovingMap[Ceiling[Mean[#]]&, data, {{7, "Day"}, Left, "Week"}, Automatic]
-
-Smooth[] :=
-	Block[{},
-		Message[Smooth::"nargs"];
-		$Failed
-	];
-
 ClearAll[SmoothPeriod];
 SyntaxInformation[SmoothPeriod] = {"ArgumentsPattern" -> {_, _, OptionsPattern[]}};
 
@@ -256,6 +289,8 @@ ToModelTime[] :=
 		Message[toModelTime::"nargs"];
 		$Failed
 	];
+	
+
 
 ClearAll[ToDataDate];
 
@@ -272,6 +307,7 @@ ToDataDate[] :=
 		$Failed
 	];
 
+
 ClearAll[FitWithDataPlot];
 
 SyntaxInformation[FitWithDataPlot] = {"ArgumentsPattern" -> {_, {_, _
@@ -280,23 +316,37 @@ SyntaxInformation[FitWithDataPlot] = {"ArgumentsPattern" -> {_, {_, _
 FitWithDataPlot::"nargs" = "First argument is expected to be a FittedModel. Second should be a minimum and maximum date objects contained in curly brackets {}";
 
 FitWithDataPlot[fit_FittedModel:"Global`", {dateMin_DateObject:"Global`",
-	 dateMax_DateObject:"Global`"}] :=
-	Module[{plotData, bands, cd = ColorData[108]},
-		plotData = {ToDataDate[dateMin, #1], #2}& @@@ fit["Data"];
-		bands[x_] = Quiet[fit["SinglePredictionBands", ConfidenceLevel -> 0.95
-			] /. t -> x];
-		Show[DateListPlot[plotData, Joined -> False, PlotRange -> All], Plot[
-			{fit[ToModelTime[dateMin, FromAbsoluteTime @ t]], bands[ToModelTime[dateMin,
-			 FromAbsoluteTime @ t]]}, {t, AbsoluteTime @ dateMin, AbsoluteTime @ 
-			dateMax}, PlotRange -> All, PlotStyle -> {cd[2], None}, Filling -> {2
-			 -> {1}}, FillingStyle -> {Opacity[0.5, Lighter @ cd[2]]}], PlotRange
-			 -> All, PlotRangePadding -> {Automatic, {Scaled[0.03], Scaled[0.1]}},
-			 FrameLabel -> {"time (d)", "number infected"}, PlotLabel -> StringForm[
-			"Estimated variance = ``", fit["EstimatedVariance"]], ImageSize -> 360
-			] // Labeled[#, Column[{PointLegend[{cd[1]}, {"observed"}], LineLegend[
-			{cd[2]}, {"calculated"}], SwatchLegend[{Opacity[0.5, Lighter @ cd[2]]
-			}, {"95% prediction band"}]}, Left], Right]&
-	]
+	 dateMax_DateObject: "Global`"}] :=
+	Module[{plotData, bands, cd},
+    cd = ColorData[108];
+    plotData = {ToDataDate[dateMin, #1], #2} & @@@ fit["Data"];
+    bands[x_] = Quiet[fit["SinglePredictionBands", ConfidenceLevel -> 0.95] /. t -> x];
+    Show[
+      DateListPlot[plotData,
+      Joined -> False,
+      PlotRange -> All
+      ],
+      Plot[{fit[ToModelTime[dateMin, FromAbsoluteTime@t]], 
+        bands[ToModelTime[dateMin, FromAbsoluteTime@t]]}, {t, 
+        AbsoluteTime@dateMin, AbsoluteTime@dateMax},
+      PlotRange -> All,
+      PlotStyle -> {cd[2], None},
+      Filling -> {2 -> {1}},
+      FillingStyle -> {Opacity[0.5, Lighter@cd[2]]},
+      Exclusions -> None
+      ],
+      PlotRange -> All,
+      PlotRangePadding -> {Automatic, {Scaled[0.03], Scaled[0.1]}},
+      FrameLabel -> {"tempo (d)", "# de infectados"},
+      PlotLabel -> 
+      StringForm["R-Quadrado = ``", fit["AdjustedRSquared"]],
+      ImageSize -> 360
+      ] // Labeled[#, 
+      Column[{PointLegend[{cd[1]}, {"Observado"}], 
+        LineLegend[{cd[2]}, {"Calculado"}]}, 
+        Left], Right] &
+  ] 
+	
 
 FitWithDataPlot[] :=
 	Block[{},
@@ -304,15 +354,17 @@ FitWithDataPlot[] :=
 		$Failed
 	];
 
+
 ClearAll[ModelSensitivityPlot];
 
-SyntaxInformation[ModelSensitivityPlot] = {"ArgumentsPattern" -> {_, _, {{_, _}, {_, _}}, _.}};
+SyntaxInformation[ModelSensitivityPlot] = {"ArgumentsPattern" -> {_,_,{{_,_},{_,_}},{_}}};
 
 ModelSensitivityPlot::"nargs" = "First argument is a ParametricFunction, Second a FittedModel, Third minimum and max numbers for t and y, and Fourth the scale in NumberQ";
 
-ModelSensitivityPlot[modelIn :(_ParametricFunction[__]), fit_: "Global`", 
-{{tMin_NumberQ: "Global`", tMax_NumberQ: "Global`"}, {yMin_NumberQ: "Global`", yMax_NumberQ: "Global`"}}, scale: {__NumberQ}] :=
-	Module[{model, sensitivities, cd = ColorData[108], params, t},
+ModelSensitivityPlot[modelIn_: "Global`", fit_: "Global`", 
+{{tMin_NumberQ: "Global`", tMax_NumberQ: "Global`"}, {yMin_NumberQ: "Global`", yMax_NumberQ: "Global`"}}, scale_: "Global`"] :=
+	Module[{model, sensitivities, cd, params, t},
+		cd = ColorData[108];
 		params = fit["BestFitParameters"];
 		model = modelIn[t] /. params;
 		sensitivities = MapThread[model + (#2 {-1, 1} D[modelIn, #1][t] /. 
@@ -336,13 +388,14 @@ ModelSensitivityPlot[modelIn :(_ParametricFunction[__]), fit_: "Global`",
 				,
 				{Keys @ params, sensitivities, scale}
 			]
-	]
+		]
 
-ModelSensitivityPlot[] :=
+(*ModelSensitivityPlot[] :=
 	Block[{},
 		Message[ModelSensitivityPlot::"nargs"];
 		$Failed
-	];
+	];*)
+
 
 
 ClearAll[ResidualsPlot];
@@ -364,6 +417,32 @@ ResidualsPlot[] :=
 		Message[ResidualsPlot::"nargs"];
 		$Failed
 	];
+	
+
+
+ClearAll[SumSquaredError]
+SumSquaredError::len = "The length of the data list `` is not the same as the length of the model list ``."; 
+SumSquaredError[fitData:{{_?NumberQ, _?NumberQ}..}, model:Except[{__}], params_] := 
+	SumSquaredError[{fitData}, {model}, params]
+SumSquaredError[fitDataList:{{{_?NumberQ, _?NumberQ}..}..}, modelList:{__}, 
+  params:{(_ -> _?NumberQ)..}] /; Length[fitDataList] == Length[modelList] || 
+  Message[SumSquaredError::len, Length[fitDataList], Length[modelList]] := 
+	Module[{time, observed, calculated, sse}, 
+  sse = MapThread[
+   Function[{data, model}, 
+    time = First /@ data; 
+    observed = Last /@ data; 
+    calculated = Quiet[Check[model /@ time /. params, $Failed]]; 
+    (calculated - observed)^2
+    ], 
+   {fitDataList, modelList}
+   ] // Total[#, 2]&; 
+  If[FreeQ[sse, $Failed], 
+   sse, 
+    (* else *)
+   Sqrt[$MaxMachineNumber]
+   ]
+  ] 
 
 End[]; (* `Private` *)
 

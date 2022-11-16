@@ -744,7 +744,7 @@ SEIRModel[___] :=
    with the code modified SEIR.
 *)
 
-Clear[SEIQRModel];
+(* Clear[SEIQRModel];
 
 SyntaxInformation[SEIQRModel] = { "ArgumentsPattern" -> { _, _., OptionsPattern[] } };
 
@@ -897,7 +897,7 @@ SEIQRModel[___] :=
     Block[{},
       Message[SEIQRModel::"nargs"];
       $Failed
-    ];
+    ]; *)
 
 
 (***********************************************************)
